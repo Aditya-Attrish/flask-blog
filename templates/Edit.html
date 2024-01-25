@@ -1,0 +1,25 @@
+{% extends "Base.html" %}
+ {% block body %}
+    <div class="container my-3">
+    	{% if sno==0 %}
+        	<h2>Add a Post</h2>
+        {% else %}
+        	<h2>Update the post</h2>
+        {% endif %}
+        <form action="/edit/{{sno}}" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="title" class="form-label">Post Title</label>
+              <input type="text" class="form-control" name="title" id="title" value="{{post.title}}"> 
+            </div>
+            <div class="mb-3">
+              <label for="content" class="form-label">Post content</label>
+              <textarea type="text" class="form-control" name="content" id="content">{{post.content}}</textarea>
+            </div>
+            <div class="mb-3">
+            <label for="thumbnail" class="form-group">Upload thumbnail:</label>
+            <input type="file" class="form-control" accept=".jpg, .png, .jpeg" name="thumbnail" value="{{post.thumb}}">
+        </div>
+            <button type="submit" class="btn btn-dark">Save the post</button>
+          </form>
+    </div>
+{% endblock %}
