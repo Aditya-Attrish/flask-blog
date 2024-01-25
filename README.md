@@ -1,2 +1,2 @@
 # flask-blog
-This is for flask blog.
+i made for purpose of learning.
