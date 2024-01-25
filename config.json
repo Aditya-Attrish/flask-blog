@@ -1,0 +1,10 @@
+{
+	"params":
+	{
+		"blog_web_name": "My Blog",
+		"local_server":"True",
+		"local_uri":"sqlite:///myInterest.db",
+		"prod_uri":"sqlite:///myInterest.db",
+		"no_of_per_page": 2
+	}
+}
