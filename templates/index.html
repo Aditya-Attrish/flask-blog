@@ -12,7 +12,7 @@
             {% else %}
                 {% set userImg = "thumb/" + post.author.userImg %}
             {% endif %}
-            <img src="{{ url_for('static', filename=userImg) }}" alt="Author Photo" class="img-fluid rounded-circle" style="width: 40px; height: 40px;">
+            <img src="{{ url_for('static', filename=userImg) }}" alt="Author Photo" class="img-fluid rounded-circle" style="width: 35px; height: 35px;">
                 <span class="ms-2">{{ post.author.username }}</span>
             <p class="card-text">{{ post.content[:100] }}...</p>
         </div>
