@@ -1,0 +1,49 @@
+{% extends "Base.html" %}
+{% block title %}Admin Panel{% endblock %}
+{% block body %}
+<div class="container my-3">
+    <div class="d-flex align-items-center">
+        <div>
+            <!-- Add an editing button to allow users to change their profile picture and username -->
+            <img src="{{url_for('static',filename=current_user.userImg)}}" class="img-fluid rounded-circle" style="width: 50px; height: 50px;">
+        </div>
+        <h2 class="ms-2">{{ current_user.username }}</h2>
+    </div>
+    <a href="/edit_profile" class="btn btn-outline-primary me-2">Edit Profile</a>
+    <a class="btn btn-outline-danger my-2 my-sm-0" href="{{ url_for('logout') }}">Logout</a>
+    <hr>
+    <a class="btn btn-primary my-2 my-sm-0" href="/edit/{{0}}">New post</a>
+    <h3>Your Posts</h3>
+    {% if current_user.posts|length == 0 %}
+    <div class="alert alert-dark" role="alert">
+        No Posts found. Add your first post now!
+    </div>
+    {% else %}
+    <div class="table-responsive"> <!-- Add a div with the class 'table-responsive' to handle horizontal overflow -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">SNo</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in current_user.posts %}
+                <tr>
+                    <th scope="row">{{loop.index}}</th>
+                    <td>{{post.title}}</td>
+                    <td>{{post.date_posted.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+                    <td>
+                        <a href="/edit/{{post.sno}}" type="button" class="btn btn-outline-dark btn-sm mx-1">Update</a> <!-- Close the 'a' tag properly -->
+                        <a href="/delete/{{post.sno}}" type="button" class="btn btn-outline-dark btn-sm mx-1">Delete</a> <!-- Close the 'a' tag properly -->
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
