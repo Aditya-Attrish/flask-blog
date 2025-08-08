@@ -16,7 +16,7 @@ def home():
     posts = BlogPost.query.order_by(BlogPost.date_posted.desc()).paginate(page=page, per_page=per_page, error_out=False)
     return render_template('index.html', posts=posts, params=params)
 
-@app.route("/contact")
+@app.route("/contact", methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
         name = request.form['name']
@@ -40,14 +40,14 @@ def post(post_sno):
 @app.route("/login",methods=["GET","POST"])
 def login():
 	if request.method == 'POST':
-	       user = request.form['username']
-	       pas = request.form['password']
-	       remember = request.form['remember']
-	       
-	       usern = User.query.filter_by(username=user).first()
-	       if usern and check_password_hash(usern.password, pas):
-	       	login_user(usern,remember=remember=="on")
-	       return redirect('/admin')
+        user = request.form['username']
+        pas = request.form['password']
+        remember = request.form.get('remember', '')
+        
+        usern = User.query.filter_by(username=user).first()
+        if usern and check_password_hash(usern.password, pas):
+            login_user(usern, remember=remember=="on")
+            return redirect('/admin')
 	return render_template("login.html",params=params)
 
 @app.route("/register",methods=["GET","POST"])
@@ -58,16 +58,16 @@ def register():
         pas = request.form['password']
         remember = request.form['remember']
         confirm_password = request.form['confirm_password']
-	       
-	    # Check if the username is already taken
+        
+        # Check if the username is already taken
         existing_user = User.query.filter_by(username=usern).first()
         if existing_user:
             flash('Username already taken. Please choose a different username.', 'danger')
             return redirect('/register')
         
         if pas != confirm_password:
-	        flash('Passwords do not match. Please try again.', 'danger')
-	        return redirect('/register')
+            flash('Passwords do not match. Please try again.', 'danger')
+            return redirect('/register')
 
         # Hashing a password
         hashed_password = generate_password_hash(pas, method='pbkdf2:sha256')
@@ -112,9 +112,10 @@ def edit(sno):
         file = request.files['thumbnail']
         con = request.form.get('content')
         thumb=f"thumb/{file.filename}"
-        Path=app.config['UPLOAD_THUMB']
-        if not os.path.isfile(Path):
-        	file.save(os.path.join(Path, secure_filename(thumb)))
+        Path=app.config['UPOAD_THUMB']
+        if not os.path.exists(Path):
+            os.makedirs(Path)
+        file.save(os.path.join(Path, secure_filename(file.filename)))
         if sno==0:
         	post=BlogPost(title=title,content=con,thumb=thumb,author=current_user)
         	db.session.add(post)
@@ -139,7 +140,7 @@ def delete(post_sno):
     if post.author != current_user:
         abort(403)  # Forbidden
         
-    file_path=app.config['UPLOAD_THUMB']+post.thumb
+    file_path=app.config['UPOAD_THUMB']+post.thumb
     if os.path.isfile(file_path):
     	os.remove(file_path)
     db.session.delete(post)
