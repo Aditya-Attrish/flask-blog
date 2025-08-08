@@ -8,8 +8,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 app.config['SECRET_KEY'] = 'super-secret-key'
 
-# My android phone directory
-app.config['UPOAD_THUMB']="/storage/emulated/0/Blog/static/"
+# Set the upload folder
+app.config['UPOAD_THUMB'] = os.path.join(app.root_path, 'static/thumb/')
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
