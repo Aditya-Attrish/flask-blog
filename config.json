@@ -2,6 +2,8 @@
 	"params":
 	{
 		"blog_web_name": "My Blog",
-		"no_of_per_page": 2
+		"no_of_per_page": 2,
+		"blog_web_host": "0.0.0.0",
+		"blog_web_port": 8080,
 	}
 }

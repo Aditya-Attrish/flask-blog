@@ -1,9 +1,11 @@
 from __init__ import app, BlogPost, User, Contact, db, os
 from flask import render_template, request, redirect, url_for, flash, abort
 from flask_login import login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from json import load
 
+# Load configuration parameters from config.json
 with open("config.json","r") as c:
 	params=load(c)["params"]
 
@@ -16,15 +18,15 @@ def home():
 
 @app.route("/contact")
 def contact():
-	if request.method == 'POST':
-	       name = request.form['name']
-	       email = request.form['email']
-	       message = request.form['message']
-	       contact = Contact(name=name,email=email,message=message)
-	       db.session.add(contact)
-	       db.session.commit()
-	       
-	return render_template('contact.html',params=params)
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        message = request.form['message']
+        contact = Contact(name=name,email=email,message=message)
+        db.session.add(contact)
+        db.session.commit()
+    
+    return render_template('contact.html',params=params)
 	
 @app.route("/about")
 def about():
@@ -43,37 +45,39 @@ def login():
 	       remember = request.form['remember']
 	       
 	       usern = User.query.filter_by(username=user).first()
-	       if usern and usern.password==pas:
+	       if usern and check_password_hash(usern.password, pas):
 	       	login_user(usern,remember=remember=="on")
 	       return redirect('/admin')
 	return render_template("login.html",params=params)
 
 @app.route("/register",methods=["GET","POST"])
 def register():
-	if request.method == 'POST':
-	       email = request.form['emailId']
-	       usern = request.form['username']
-	       pas = request.form['password']
-	       remember = request.form['remember']
-	       confirm_password = request.form['confirm_password']
+    if request.method == 'POST':
+        email = request.form['emailId']
+        usern = request.form['username']
+        pas = request.form['password']
+        remember = request.form['remember']
+        confirm_password = request.form['confirm_password']
 	       
-	       # Check if the username is already taken
-	       existing_user = User.query.filter_by(username=usern).first()
-	       if existing_user:
-	           flash('Username already taken. Please choose a different username.', 'danger')
-	           return redirect('/register')
-	       
-	       if pas != confirm_password:
-	           flash('Passwords do not match. Please try again.', 'danger')
-	           return redirect('/register')
+	    # Check if the username is already taken
+        existing_user = User.query.filter_by(username=usern).first()
+        if existing_user:
+            flash('Username already taken. Please choose a different username.', 'danger')
+            return redirect('/register')
+        
+        if pas != confirm_password:
+	        flash('Passwords do not match. Please try again.', 'danger')
+	        return redirect('/register')
 
-	       user = User(email=email,username=usern,password=pas)
-	       db.session.add(user)
-	       db.session.commit()
-	       
-	       login_user(user,remember=remember=="on")
-	       return redirect('/admin')
-	return render_template("register.html",params=params)
+        # Hashing a password
+        hashed_password = generate_password_hash(pas, method='pbkdf2:sha256')
+        user = User(email=email,username=usern,password=hashed_password)
+        db.session.add(user)
+        db.session.commit()
+        
+        login_user(user,remember=remember=="on")
+        return redirect('/admin')
+    return render_template("register.html",params=params)
 
 @app.route('/admin')
 @login_required
