@@ -36,6 +36,16 @@ def about():
 def post(post_sno):
     post = BlogPost.query.get(post_sno)
     return render_template('post.html', post=post, params=params)
+
+@app.route("/search")
+def search():
+    query = request.args.get('query')
+    if query:
+        posts = BlogPost.query.filter(BlogPost.title.contains(query) | BlogPost.content.contains(query)).all()
+    else:
+        posts = []
+
+    return render_template('search.html', results=posts, params=params)
     
 @app.route("/login",methods=["GET","POST"])
 def login():
@@ -92,8 +102,8 @@ def edit_profile():
         if 'profile_photo' in request.files:
             file = request.files['profile_photo']
             if file.filename != current_user.userImg:
-                filename = "userImg/" +  secure_filename(file.filename)
-                file.save(os.path.join("/storage/emulated/0/Blog/static/", filename))
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app['UPOAD_USERIMG'], filename))
                 # Save the filename to the user's profile in the database
                 user = User.query.filter_by(id=current_user.id).first()
                 user.userImg = filename

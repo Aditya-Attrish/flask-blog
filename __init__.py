@@ -11,6 +11,9 @@ app.config['SECRET_KEY'] = 'super-secret-key'
 # Set the upload folder
 app.config['UPOAD_THUMB'] = os.path.join(app.root_path, 'static/thumb/')
 
+# set the userImg folder
+app.config['UPOAD_USERIMG'] = os.path.join(app.root_path, 'static/userImg/')
+
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -18,10 +21,10 @@ login_manager.login_view = 'login'
 # Define User model
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    userImg = db.Column(db.String(50), nullable=True)
+    userImg = db.Column(db.String(50), default='userImg/user_icon.svg')
     email = db.Column(db.String(50), unique=True, nullable=False)
     username = db.Column(db.String(50), nullable=False)
-    password = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(255), unique=True, nullable=False)
     posts = db.relationship('BlogPost', backref='author', lazy=True)
 
 # Define Contact model
@@ -34,7 +37,7 @@ class Contact(db.Model):
 # Define BlogPost model
 class BlogPost(db.Model):
     sno = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(150), nullable=False)
     content = db.Column(db.Text, nullable=False)
     thumb = db.Column(db.String(30),nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
