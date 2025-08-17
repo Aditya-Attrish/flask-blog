@@ -39,7 +39,7 @@ def post(post_sno):
     
 @app.route("/login",methods=["GET","POST"])
 def login():
-	if request.method == 'POST':
+    if request.method == 'POST':
         user = request.form['username']
         pas = request.form['password']
         remember = request.form.get('remember', '')
@@ -48,7 +48,7 @@ def login():
         if usern and check_password_hash(usern.password, pas):
             login_user(usern, remember=remember=="on")
             return redirect('/admin')
-	return render_template("login.html",params=params)
+    return render_template("login.html",params=params)
 
 @app.route("/register",methods=["GET","POST"])
 def register():

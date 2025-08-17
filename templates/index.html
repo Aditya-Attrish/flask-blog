@@ -11,6 +11,7 @@
             <h5 class="card-title"><a href="{{ url_for('post', post_sno=post.sno) }}">{{ post.title }}</a></h5>
             <img src="{{ url_for('static', filename=post.author.userImg) }}" alt="Author Photo" class="img-fluid rounded-circle" style="width: 35px; height: 35px;">
                 <span class="ms-2">{{ post.author.username }}</span>
+            <hr>
             <p class="card-text">{{ post.content[:100] }}...</p>
         </div>
     </div>
