@@ -164,3 +164,8 @@ def delete(post_sno):
 def logout():
 	logout_user()
 	return redirect("/login")
+
+# 404 error handler
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html',params=params), 404
