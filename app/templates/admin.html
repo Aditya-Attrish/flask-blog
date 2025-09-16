@@ -10,9 +10,9 @@
         <h2 class="ms-2">{{ current_user.username }}</h2>
     </div>
     <a href="/edit_profile" class="btn btn-outline-primary me-2">Edit Profile</a>
-    <a class="btn btn-outline-danger my-2 my-sm-0" href="{{ url_for('logout') }}">Logout</a>
+    <a class="btn btn-outline-danger my-2 my-sm-0" href="{{ url_for('auth.logout') }}">Logout</a>
     <hr>
-    <a class="btn btn-primary my-2 my-sm-0" href="/edit/{{0}}">New post</a>
+    <a class="btn btn-primary my-2 my-sm-0" href="/user/edit/{{0}}">New post</a>
     <h3>Your Posts</h3>
     {% if current_user.posts|length == 0 %}
     <div class="alert alert-dark" role="alert">
