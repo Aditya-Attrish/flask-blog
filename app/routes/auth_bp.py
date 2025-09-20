@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, flash
+from flask import Blueprint, render_template, request, redirect, flash, url_for
 from flask_login import login_user, login_required, logout_user
 from app.models.user import User
 from app.extensions import db, params
@@ -47,7 +47,7 @@ def register():
         db.session.commit()
 
         login_user(user, remember=remember == "on")
-        return redirect('/user')
+        return redirect(url_for('user.admin'))
     return render_template("register.html", params=params)
 
 @auth_bp.route('/logout')

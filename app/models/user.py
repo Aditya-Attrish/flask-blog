@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 # Define User model
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    userImg = db.Column(db.String(50), default='userImg/user_icon.svg')
+    userImg = db.Column(db.String(50), default='userImg/default-user.jpg')
     email = db.Column(db.String(50), unique=True, nullable=False)
     username = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(255), unique=True, nullable=False)

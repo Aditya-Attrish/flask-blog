@@ -1,49 +1,131 @@
-{% extends "Base.html" %}
-{% block title %}Admin Panel{% endblock %}
+{% extends "components/layout.html" %}
+{% block title %}Admin Panel - {{ params["blog_web_name"] }} {% endblock %}
+
+{% block styles %}
+/* DataTable Customization */
+.dataTables_wrapper {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+table.dataTable {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+{% endblock %}
+
 {% block body %}
 <div class="container my-3">
     <div class="d-flex align-items-center">
         <div>
             <!-- Add an editing button to allow users to change their profile picture and username -->
-            <img src=" l{{url_for('static',filename=current_user.userImg)}}" class="img-fluid rounded-circle" style="width: 50px; height: 50px;">
+            <img src="{{url_for('static',filename=current_user.userImg)}}" class="img-fluid rounded-circle" style="width: 50px; height: 50px;">
         </div>
         <h2 class="ms-2">{{ current_user.username }}</h2>
     </div>
-    <a href="/edit_profile" class="btn btn-outline-primary me-2">Edit Profile</a>
+    <a href="{{url_for('user.edit_profile')}}" class="btn btn-outline-primary me-2">Edit Profile</a>
     <a class="btn btn-outline-danger my-2 my-sm-0" href="{{ url_for('auth.logout') }}">Logout</a>
     <hr>
-    <a class="btn btn-primary my-2 my-sm-0" href="/user/edit/{{0}}">New post</a>
-    <h3>Your Posts</h3>
+
+    <div class="admin-header">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2 class="fw-bold mb-0">Blog Posts Management</h2>
+                <p class="text-muted mb-0">Manage all your blog posts in one place</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="/user/add" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Add New Post
+                </a>
+            </div>
+        </div>
+    </div>
+   
+    <h3 class="my-3">Your Posts</h3>
     {% if current_user.posts|length == 0 %}
     <div class="alert alert-dark" role="alert">
         No Posts found. Add your first post now!
     </div>
     {% else %}
-    <div class="table-responsive"> <!-- Add a div with the class 'table-responsive' to handle horizontal overflow -->
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">SNo</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Time</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for post in current_user.posts %}
-                <tr>
-                    <th scope="row">{{loop.index}}</th>
-                    <td>{{post.title}}</td>
-                    <td>{{post.date_posted.strftime('%Y-%m-%d %H:%M:%S')}}</td>
-                    <td>
-                        <a href="/edit/{{post.sno}}" type="button" class="btn btn-outline-dark btn-sm mx-1">Update</a> <!-- Close the 'a' tag properly -->
-                        <a href="/delete/{{post.sno}}" type="button" class="btn btn-outline-dark btn-sm mx-1">Delete</a> <!-- Close the 'a' tag properly -->
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <!-- Posts Table -->
+        <div class="dataTables_wrapper table-responsive">
+            <table id="postsTable" class="table table-hover" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Views</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in current_user.posts %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="{{ post.thumbnail }}" alt="{{ post.title }}" 
+                                     class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                <div>
+                                    <div class="fw-bold">{{ post.title[:30] }}</div>
+                                    <small class="text-muted">{{ post.excerpt[:50] }}...</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ post.author }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ post.category }}</span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ post.status }}">
+                                    {{ post.status|capitalize }}
+                                </span>
+                            </td>
+                            <td>{{ post.views }}</td>
+                            <td>{{ post.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <a href="/blog/{{ post.slug }}" target="_blank" class="action-btn btn btn-sm btn-outline-primary" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="/admin/edit-post/{{ post.id }}" class="action-btn btn btn-sm btn-outline-success" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                                        </a>
+                                                        <button class="action-btn btn btn-sm btn-outline-danger delete-post" 
+                                                                data-id="{{ post.id }}" data-title="{{ post.title }}" title="Delete" onclick="deletePost(this);" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
     {% endif %}
+    {% include 'components/model.html' %}
 </div>
+<script>
+    function deletePost(e) {
+        const postId = e.getAttribute('data-id');
+        document.getElementById('confirmDelete').onclick = async ()=> {
+            const response = await fetch('/user/deletePost', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({post_sno: postId})
+            });
+            if (response.ok) {
+                window.location.reload();
+            }
+            
+        }
+
+    }
+</script>
 {% endblock %}

@@ -1,5 +1,5 @@
 {% extends "components/layout.html" %}
-{% block title %}Edit Post - {{ params["blog_web_name"] }} {% endblock %}
+{% block title %}Add New Post - {{ params["blog_web_name"] }} {% endblock %}
 
 {% block head %}
     <!-- Quill Rich Text Editor -->
@@ -197,7 +197,7 @@
                                 <div class="col-md-8">
                                     <div class="mb-4">
                                         <label for="postTitle" class="form-label fw-bold">Post Title *</label>
-                                        <input type="text" class="form-control form-control-lg" value="{{ post.title }}" id="postTitle" 
+                                        <input type="text" class="form-control form-control-lg" id="postTitle" 
                                                name="title" required placeholder="Enter a compelling title...">
                                         <div class="character-count" id="titleCount">0/120 characters</div>
                                     </div>

@@ -1,21 +1,29 @@
 # upload file
 import os
 from werkzeug.utils import secure_filename
+from datetime import datetime
 
+# Allowed file extensions
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def upload_thumbnail(file):
+def upload_image(file, folder_name, current_img):
     # set the upload folder
-    UPLOAD_FOLDER = '../static/thumb/'
-    if file:
+    UPLOAD_FOLDER = f'./app/static/{folder_name}/'
+    if file and file.filename and allowed_file(file.filename):
+        # remove the current image if it exists and default image is not empty
+        if current_img and 'default-user.jpg' not in current_img:
+            file_path = os.path.join(UPLOAD_FOLDER, current_img.split('/')[-1])
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        elif not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)
+            
         filename = secure_filename(file.filename)
-        file.save(os.path.join(UPLOAD_FOLDER, filename))
-        return filename
-
-def upload_profile_photo(file):
-    # set the upload folder
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '../static/userImg/')
-    if file:
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(UPLOAD_FOLDER, filename))
-        return filename
+        unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{filename}"
+        file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
+        return f'{folder_name}/{filename}'
+    return current_img
