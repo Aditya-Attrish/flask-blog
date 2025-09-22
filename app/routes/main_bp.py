@@ -7,11 +7,45 @@ main_bp = Blueprint('/', __name__)
 
 @main_bp.route('/')
 def home():
-    page = request.args.get('page', 1, type=int)
-    per_page = params["no_of_per_page"]  # Adjust as needed
-    posts = BlogPost.query.order_by(BlogPost.created_at.desc()).paginate(
-        page=page, per_page=per_page, error_out=False)
-    return render_template('home.html', posts=posts, params=params)
+    from app.models.user import User
+    
+    # Get featured posts (most viewed or recent popular posts)
+    featured_posts = BlogPost.query.filter_by(status='published').order_by(BlogPost.views.desc()).limit(3).all()
+    
+    # Get latest posts for the recent section
+    latest_posts = BlogPost.query.filter_by(status='published').order_by(BlogPost.created_at.desc()).limit(6).all()
+    
+    # Get categories with post counts
+    categories = db.session.query(
+        BlogPost.category,
+        db.func.count(BlogPost.sno).label('count')
+    ).filter_by(status='published').group_by(BlogPost.category).all()
+    
+    # Format categories for template
+    formatted_categories = []
+    category_icons = {
+        'Technology': 'laptop',
+        'Lifestyle': 'heart',
+        'Travel': 'geo-alt',
+        'Business': 'graph-up',
+        'Health': 'activity',
+        'Education': 'book',
+        'Design': 'palette',
+        'Programming': 'code-slash'
+    }
+    
+    for category, count in categories:
+        formatted_categories.append({
+            'name': category,
+            'icon': category_icons.get(category, 'tag'),
+            'count': count
+        })
+    
+    return render_template('home.html', 
+                         featured_posts=featured_posts,
+                         latest_posts=latest_posts,
+                         categories=formatted_categories,
+                         params=params)
 
 @main_bp.route("/blogs")
 def blogs():

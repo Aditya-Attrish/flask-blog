@@ -84,77 +84,37 @@
             </div>
 
             <div class="row">
-                <!-- Featured Post 1 -->
+                {% for post in featured_posts %}
                 <div class="col-lg-4 mb-4">
                     <div class="card featured-card h-100">
-                        <span class="category-badge badge bg-primary">Technology</span>
-                        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" 
-                             class="card-img-top" alt="AI Technology">
+                        <span class="category-badge badge bg-primary">{{ post.category }}</span>
+                        <img src="{{ url_for('static', filename=post.thumbnail) }}" 
+                             class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
                         <div class="card-body">
-                            <h5 class="card-title">The Future of Artificial Intelligence in 2024</h5>
-                            <p class="card-text text-muted">Exploring the latest advancements and what they mean for the future...</p>
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="card-text text-muted">{{ post.excerpt[:100] }}...</p>
                         </div>
                         <div class="card-footer bg-transparent border-0">
                             <div class="d-flex align-items-center">
-                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" 
+                                <img src="{{ post.author_avatar }}" 
                                      class="author-avatar me-2" alt="Author">
                                 <div>
-                                    <small class="text-muted">John Doe</small>
+                                    <small class="text-muted">{{ post.author_name }}</small>
                                     <br>
-                                    <small class="text-muted">May 15, 2024 · 5 min read</small>
+                                    <small class="text-muted">{{ post.created_at.strftime('%b %d, %Y') }} · {{ (post.content|length / 200)|round|int }} min read</small>
                                 </div>
                             </div>
                         </div>
+                        <a href="{{ url_for('/.post', slug=post.slug) }}" class="stretched-link"></a>
                     </div>
                 </div>
-
-                <!-- Featured Post 2 -->
-                <div class="col-lg-4 mb-4">
-                    <div class="card featured-card h-100">
-                        <span class="category-badge badge bg-success">Lifestyle</span>
-                        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" 
-                             class="card-img-top" alt="Productivity">
-                        <div class="card-body">
-                            <h5 class="card-title">10 Productivity Hacks That Changed My Life</h5>
-                            <p class="card-text text-muted">Simple yet effective strategies to boost your productivity and achieve more...</p>
-                        </div>
-                        <div class="card-footer bg-transparent border-0">
-                            <div class="d-flex align-items-center">
-                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" 
-                                     class="author-avatar me-2" alt="Author">
-                                <div>
-                                    <small class="text-muted">Jane Smith</small>
-                                    <br>
-                                    <small class="text-muted">Apr 28, 2024 · 8 min read</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {% endfor %}
+                
+                {% if featured_posts|length == 0 %}
+                <div class="col-12 text-center">
+                    <p class="text-muted">No featured posts available yet.</p>
                 </div>
-
-                <!-- Featured Post 3 -->
-                <div class="col-lg-4 mb-4">
-                    <div class="card featured-card h-100">
-                        <span class="category-badge badge bg-warning text-dark">Travel</span>
-                        <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" 
-                             class="card-img-top" alt="Travel">
-                        <div class="card-body">
-                            <h5 class="card-title">Hidden Gems: Southeast Asia's Best Kept Secrets</h5>
-                            <p class="card-text text-muted">Discover breathtaking destinations that most tourists never find...</p>
-                        </div>
-                        <div class="card-footer bg-transparent border-0">
-                            <div class="d-flex align-items-center">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" 
-                                     class="author-avatar me-2" alt="Author">
-                                <div>
-                                    <small class="text-muted">Mike Johnson</small>
-                                    <br>
-                                    <small class="text-muted">Jun 2, 2024 · 12 min read</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% endif %}
             </div>
         </div>
     </section>
@@ -170,33 +130,40 @@
             </div>
 
             <div class="row">
-                {% for i in range(6) %}
+                {% for post in latest_posts %}
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card blog-card h-100">
-                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" 
-                             class="card-img-top" alt="Blog post">
+                        <img src="{{ url_for('static', filename=post.thumbnail) }}" 
+                             class="card-img-top" alt="{{ post.title }}" style="height: 180px; object-fit: cover;">
                         <div class="card-body">
-                            <span class="badge bg-secondary mb-2">Design</span>
-                            <h5 class="card-title">Minimalist Design Principles for Modern Websites</h5>
-                            <p class="card-text text-muted">Learn how minimalism can improve user experience and conversion rates...</p>
+                            <span class="badge bg-secondary mb-2">{{ post.category }}</span>
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="card-text text-muted">{{ post.excerpt[:80] }}...</p>
                         </div>
                         <div class="card-footer bg-transparent border-0">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
-                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=30&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" 
+                                    <img src="{{ post.author_avatar }}" 
                                          class="author-avatar me-2" alt="Author">
-                                    <small class="text-muted">Sarah Chen</small>
+                                    <small class="text-muted">{{ post.author_name }}</small>
                                 </div>
-                                <small class="text-muted">3 days ago</small>
+                                <small class="text-muted">{{ post.created_at.strftime('%b %d') }}</small>
                             </div>
                         </div>
+                        <a href="{{ url_for('/.post', slug=post.slug) }}" class="stretched-link"></a>
                     </div>
                 </div>
                 {% endfor %}
+                
+                {% if latest_posts|length == 0 %}
+                <div class="col-12 text-center">
+                    <p class="text-muted">No articles available yet.</p>
+                </div>
+                {% endif %}
             </div>
 
             <div class="text-center mt-5">
-                <a href="#" class="btn btn-outline-primary btn-lg">View All Articles</a>
+                <a href="{{ url_for('/.blogs') }}" class="btn btn-outline-primary btn-lg">View All Articles</a>
             </div>
         </div>
     </section>
@@ -212,17 +179,23 @@
             </div>
 
             <div class="row">
-                {% for category in ['Technology', 'Lifestyle', 'Travel', 'Health', 'Business', 'Education'] %}
+                {% for category in categories %}
                 <div class="col-6 col-md-4 col-lg-2 mb-3">
-                    <a href="#" class="text-decoration-none">
+                    <a href="{{ url_for('/.blogs') }}?category={{ category.name }}" class="text-decoration-none">
                         <div class="card text-center p-3 hover-shadow">
-                            <i class="bi bi-laptop text-primary fs-1 mb-2"></i>
-                            <h6 class="mb-0">{{ category }}</h6>
-                            <small class="text-muted">128 Articles</small>
+                            <i class="bi bi-{{ category.icon }} text-primary fs-1 mb-2"></i>
+                            <h6 class="mb-0">{{ category.name }}</h6>
+                            <small class="text-muted">{{ category.count }} Articles</small>
                         </div>
                     </a>
                 </div>
                 {% endfor %}
+                
+                {% if categories|length == 0 %}
+                <div class="col-12 text-center">
+                    <p class="text-muted">No categories available yet.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </section>
