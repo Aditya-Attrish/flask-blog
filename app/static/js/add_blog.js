@@ -107,7 +107,7 @@ class AddNewBlog {
             
             const data = await response.json();
             if (data.success) {
-                window.location.href = `/blogs/post/${data.post_slug}`;
+                window.location.href = `/post/${data.post_slug}`;
             } else {
                 alert(data.message);
             }

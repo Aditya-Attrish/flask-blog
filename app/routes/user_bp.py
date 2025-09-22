@@ -1,7 +1,6 @@
 from flask import Blueprint, json, render_template, request, redirect, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
-from app.utils.uploader import upload_image
-from app.utils.helper import generate_slug
+from app.utils.uploader import upload_image, remove_image
 from app.models.user import User
 from app.models.posts import BlogPost
 from app.extensions import db, params
@@ -37,31 +36,10 @@ def edit_profile():
 def add():    
     return render_template('add_blog.html', params=params)
 
-@user_bp.route('/edit/<int:sno>', methods=['GET','POST'])
+@user_bp.route('/edit/<int:sno>')
 def edit(sno):
-  if (request.method == 'POST'):
-      #slug = request.form.get('slug')
-      title = request.form.get('title')
-      file = request.files['thumbnail']
-      con = request.form.get('content')
-      if sno == 0:
-          thumb = upload_image(file, folder_name='thumb', current_img='')
-          post = BlogPost(title=title,
-                          content=con,
-                          thumb=thumb,
-                          author=current_user)
-          db.session.add(post)
-          db.session.commit()
-      else:
-          post = BlogPost.query.filter_by(sno=sno).first()
-          #post.slug=slug
-          post.title = title
-          post.thumb = upload_image(file, folder_name='thumb', current_img=post.thumb)
-          post.content = con
-          db.session.commit()
-      return redirect(url_for('user.admin'))
-  post = BlogPost.query.filter_by(sno=sno).first()
-  return render_template('Edit.html', post=post, sno=sno, params=params)
+    post = BlogPost.query.filter_by(sno=sno).first()
+    return render_template('edit_blog.html', post=post, sno=sno, params=params)
 
 @user_bp.route('/deletePost/<int:post_sno>', methods=['DELETE'])
 @login_required
@@ -73,10 +51,7 @@ def deletePost(post_sno):
     if post.user_id != current_user.id:
         return jsonify({ 'success': False, 'message': "You are not authorized to delete this post"}), 403
 
-    if post.thumbnail:
-        thumbnail_path = os.path.join('./app/static/', post.thumbnail)
-        if os.path.exists(thumbnail_path):
-            os.remove(thumbnail_path)
+    remove_image(post.thumbnail)
     
     db.session.delete(post)
     db.session.commit()

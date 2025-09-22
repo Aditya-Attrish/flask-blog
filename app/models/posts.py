@@ -19,3 +19,21 @@ class BlogPost(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     comments = db.relationship('Comment', backref='post', lazy=True)
+
+    def to_dict(self):
+        return {
+            'sno': self.sno,
+            'excerpt': self.excerpt,
+            'slug': self.slug,
+            'title': self.title,
+            'category': self.category,
+            'content': self.content,
+            'meta_description': self.meta_description,
+            'thumbnail': self.thumbnail,
+            'status': self.status,
+            'views': self.views,
+            'comments': self.comments,
+            'publish_date': self.publish_date,
+            'created_at': self.created_at,
+            'user_id': self.user_id
+        }

@@ -27,3 +27,9 @@ def upload_image(file, folder_name, current_img):
         file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
         return f'{folder_name}/{unique_filename}'
     return current_img
+
+def remove_image(file_path):
+    if file_path:
+        full_path = os.path.join('./app/static/', file_path)
+        if os.path.exists(full_path):
+            os.remove(full_path)
