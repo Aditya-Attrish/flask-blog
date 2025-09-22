@@ -113,7 +113,7 @@ table.dataTable {
         const postId = e.getAttribute('id');
         document.getElementById('confirmDelete').onclick = async ()=> {
             try {
-                const response = await fetch(`/user/deletePost/${postId}`, {
+                const response = await fetch(`/api/deletePost/${postId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
