@@ -83,13 +83,15 @@ class AddNewBlog {
             formData.append('title', this.postTitle.value);
             formData.append('excerpt', this.postExcerpt.value);
             formData.append('category', this.postCategory.value);
-            // formData.append('tags', this.postTags.value);
-            // formData.append('slug', this.postSlug.value);
-            // formData.append('meta_description', this.postMeta.value);
-            // formData.append('content', this.quill.root.innerHTML);
-            // formData.append('featured_image', this.featuredImage.files[0]);
-            // formData.append('publish_date', this.publishDate.value);
-            // formData.append('status', this.statusDraft.checked ? 'draft' : this.statusPublish.checked ? 'publish' : 'schedule');
+            formData.append('tags', this.postTags.value || '');
+            formData.append('slug', this.postSlug.value || '');
+            formData.append('meta_description', this.postMeta.value || '');
+            formData.append('content', this.quill.root.innerHTML);
+            if (this.featuredImage.files[0]) {
+                formData.append('featured_image', this.featuredImage.files[0]);
+            }
+            formData.append('publish_date', this.publishDate.value || '');
+            formData.append('status', this.statusDraft.checked ? 'draft' : this.statusPublish.checked ? 'publish' : 'schedule');
             // console.log(formData);
             
             const response = await fetch('/api/blogs', {
