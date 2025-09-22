@@ -36,7 +36,7 @@ def create_update_post():
         validate_csrf(csrf_token)
     except ValidationError:
         return jsonify({'success': False, 'message': 'CSRF token invalid'}), 400
-    
+    return jsonify({'success': False, 'message': 'CSRF token valid'}), 400
     # Check if it's an update or create
     is_update = request.method == 'PUT'
     post_id = request.args.get('id') if is_update else None
