@@ -258,13 +258,13 @@
         
         <!-- Action Buttons -->
         <div class="action-buttons">
-            <a href="{{ url_for('main.home') }}" class="btn btn-primary">
+            <a href="{{ url_for('/.home') }}" class="btn btn-primary">
                 <i class="bi bi-house me-2"></i>Go Home
             </a>
-            <a href="{{ url_for('blog.blog_list') }}" class="btn btn-outline">
+            <a href="{{ url_for('/.blogs') }}" class="btn btn-outline">
                 <i class="bi bi-file-text me-2"></i>Browse Articles
             </a>
-            <a href="{{ url_for('main.contact') }}" class="btn btn-outline">
+            <a href="{{ url_for('/.contact') }}" class="btn btn-outline">
                 <i class="bi bi-envelope me-2"></i>Contact Support
             </a>
         </div>
@@ -273,17 +273,16 @@
         <div class="suggested-links">
             <h5>Popular Pages</h5>
             <div class="link-grid">
-                <a href="{{ url_for('blog.blog_list') }}" class="link-item">All Articles</a>
-                <a href="{{ url_for('main.about') }}" class="link-item">About Us</a>
-                <a href="{{ url_for('blog.categories') }}" class="link-item">Categories</a>
-                <a href="{{ url_for('main.contact') }}" class="link-item">Contact</a>
+                <a href="{{ url_for('/.blogs') }}" class="link-item">All Articles</a>
+                <a href="{{ url_for('/.about') }}" class="link-item">About Us</a>
+                <a href="{{ url_for('/.contact') }}" class="link-item">Contact</a>
             </div>
         </div>
         
         <!-- Footer Note -->
         <div class="mt-4">
             <small class="text-muted">
-                If you believe this is an error, please <a href="{{ url_for('main.contact') }}">contact us</a>
+                If you believe this is an error, please <a href="{{ url_for('/.contact') }}">contact us</a>
             </small>
         </div>
     </div>

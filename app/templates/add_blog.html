@@ -2,6 +2,7 @@
 {% block title %}Add New Post - {{ params["blog_web_name"] }} {% endblock %}
 
 {% block head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Quill Rich Text Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <!-- Dropzone for file uploads -->
@@ -188,7 +189,7 @@
                         <div class="step">4</div>
                     </div>
 
-                    <form id="blogForm" class="form-card" method="POST" enctype="multipart/form-data">
+                    <form id="blogForm" class="form-card" enctype="multipart/form-data">
                         <!-- Basic Information Section -->
                         <div class="form-section">
                             <h4 class="fw-bold mb-4"><i class="bi bi-info-circle me-2"></i>Basic Information</h4>
@@ -230,7 +231,7 @@
 
                             <div class="mb-4">
                                 <label class="form-label fw-bold">Post Content *</label>
-                                <div id="editor"></div>
+                                <div id="editor" style="overflow-y: auto;"></div>
                                 <input type="hidden" id="postContent" name="content" required>
                             </div>
                         </div>
@@ -399,10 +400,13 @@
     </section>
 
     
+{% endblock %}
+
+        {% block scripts %}
     <!-- Quill Rich Text Editor -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <!-- Dropzone for file uploads -->
     <script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>
 
     <script src="{{ url_for('static', filename='js/add_blog.js') }}">
-{% endblock %}
+        {% endblock %}

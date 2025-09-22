@@ -15,7 +15,7 @@ class BlogPost(db.Model):
     status = db.Column(db.String(40), nullable=False)
     views = db.Column(db.Integer, default=0)
     comments = db.Column(db.Integer, default=0)
-    publish_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    publish_date = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     comments = db.relationship('Comment', backref='post', lazy=True)

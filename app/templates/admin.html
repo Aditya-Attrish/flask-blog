@@ -96,7 +96,7 @@ table.dataTable {
                                     <i class="bi bi-pencil"></i>
                                                         </a>
                                                         <button class="action-btn btn btn-sm btn-outline-danger delete-post" 
-                                                                data-id="{{ post.id }}" data-title="{{ post.title }}" title="Delete" onclick="deletePost(this);" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                                                id="{{ post.sno }}" data-title="{{ post.title }}" title="Delete" onclick="deletePost(this);" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                                             <i class="bi bi-trash"></i>
                                                         </button>
                                                     </td>
@@ -110,20 +110,29 @@ table.dataTable {
 </div>
 <script>
     function deletePost(e) {
-        const postId = e.getAttribute('data-id');
+        const postId = e.getAttribute('id');
         document.getElementById('confirmDelete').onclick = async ()=> {
-            const response = await fetch('/user/deletePost', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({post_sno: postId})
-            });
-            if (response.ok) {
-                window.location.reload();
+            try {
+                const response = await fetch(`/user/deletePost/${postId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token() }}'
+                    },
+                    // body: JSON.stringify({post_sno: postId})
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                if (data.success)
+                    window.location.reload();
+                else
+                    alert(data.message);
             }
-            
+            catch (error) {
+                console.error('Error:', error);
+            }
         }
 
     }

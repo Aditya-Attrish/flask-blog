@@ -34,53 +34,7 @@ def edit_profile():
 
 @user_bp.route('/add', methods=['GET','POST'])
 @login_required
-def add():
-    if (request.method == 'POST'):
-        try:
-            # Rollback any existing transaction to clear the error
-            db.session.rollback()
-            
-            # Get form data
-            title = request.form.get('title')
-            excerpt = request.form.get('excerpt')
-            content = request.form.get('content')
-            category = request.form.get('category')
-            tags = request.form.get('tags', '')
-            slug = request.form.get('slug')
-            meta_description = request.form.get('meta_description')
-            status = request.form.get('status')
-            publish_date = request.form.get('publish_date')
-
-            # Handle file upload
-            featured_image = request.files.get('featured_image')
-            featured_image = upload_image(featured_image, folder_name='thumbnail', current_img='')
-            if not featured_image:
-                flash('Featured image is required', 'error')
-                return render_template('add_blog.html')
-
-            # Save to database (pseudo-code)
-            blog_post = BlogPost(
-                title=title,
-                excerpt=excerpt,
-                content=content,
-                category=category,
-                #tags=tags.split(','),
-                slug=slug or generate_slug(title),
-                meta_description=meta_description,
-                thumbnail=featured_image,
-                user_id=current_user.id,
-                status=status
-            )
-
-            # Save to database (you would use your actual database model)
-            db.session.add(blog_post)
-            db.session.commit()
-                
-            flash('Blog post created successfully!', 'success')
-            return redirect(url_for('/.post', slug=blog_post.slug))
-        except Exception as e:
-            flash(f'Error creating post: {str(e)}', 'error')
-        
+def add():    
     return render_template('add_blog.html', params=params)
 
 @user_bp.route('/edit/<int:sno>', methods=['GET','POST'])
@@ -109,23 +63,22 @@ def edit(sno):
   post = BlogPost.query.filter_by(sno=sno).first()
   return render_template('Edit.html', post=post, sno=sno, params=params)
 
-@user_bp.route('/deletePost' , methods=['DELETE'])
-def deletePost():
-    post_sno = request.json.get('post_sno')
-    print("delete", post_sno)
-    post = BlogPost.query.get_or_404(int(post_sno))
+@user_bp.route('/deletePost/<int:post_sno>', methods=['DELETE'])
+@login_required
+def deletePost(post_sno):
+    post = BlogPost.query.get_or_404(post_sno)
     if not post:
-        return jsonify({'error': 'Post not found'})
-
+        return jsonify({ 'success': False, 'message': "Post not found"}), 404
     # Check if the current user is the author of the post
     if post.user_id != current_user.id:
-        abort(403)
+        return jsonify({ 'success': False, 'message': "You are not authorized to delete this post"}), 403
 
-    file_path = os.path.join('./app/static/', post.thumbnail)
-    if os.path.isfile(file_path):
-        os.remove(file_path)
+    if post.thumbnail:
+        thumbnail_path = os.path.join('./app/static/', post.thumbnail)
+        if os.path.exists(thumbnail_path):
+            os.remove(thumbnail_path)
+    
     db.session.delete(post)
     db.session.commit()
-
-    flash('Your blog post has been deleted!', 'success')
-    return jsonify({'message': 'Post deleted successfully'})
+    
+    return jsonify({'success': True, 'message': "Post deleted successfully"}), 200

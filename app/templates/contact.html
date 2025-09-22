@@ -1,30 +1,99 @@
-{% extends "Base.html" %}
-{% block title %}Contact us{% endblock %}
+{% extends "components/layout.html" %}
+{% block title %}Contact us - {{ params["blog_web_name"] }} {% endblock %}
 {% block body %}
-<div class="container mt-5">
-        <div class="row">
-            <div class="col-md-6 mx-auto">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="card-title text-center mb-4">Contact Us</h2>
-                        <form method="post">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Your Name</label>
-                                <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name">
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Your Email</label>
-                                <input type="email" name="email" class="form-control" id="email" placeholder="Enter your email">
-                            </div>
-                            <div class="mb-3">
-                                <label for="message" class="form-label">Your Message</label>
-                                <textarea class="form-control" id="message" name="message" rows="4" placeholder="Enter your message"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
-                    </div>
-                </div>
+<!-- Hero Section -->
+<section class="contact-hero" style=" background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 0;">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">Get in Touch</h1>
+                <p class="lead mb-4">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
             </div>
-         </div>
-      </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Form & Info -->
+<section class="py-5">
+    <div class="container">
+        <div class="contact-card" style=" background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            margin-top: -50px;
+            position: relative;">
+            <div class="row">
+                <!-- Contact Form -->
+                <div class="col-lg-8">
+                    <h3 class="fw-bold mb-4">Send us a Message</h3>
+
+                    <form id="contactForm" method="POST" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label fw-bold">Full Name *</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                    <div class="invalid-feedback">Please enter your name.</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label fw-bold">Email Address *</label>
+                                                <input type="email" class="form-control" id="email" name="email" required>
+                                                <div class="invalid-feedback">Please enter a valid email address.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                        <!-- <div class="mb-3">
+                            <label for="subject" class="form-label fw-bold">Subject *</label>
+                            <select class="form-select" id="subject" name="subject" required>
+                                <option value="">Select a subject</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="technical">Technical Support</option>
+                                <option value="partnership">Partnership Opportunity</option>
+                                <option value="advertising">Advertising</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a subject.</div>
+                        </div> -->
+                        <div class="mb-3">
+                            <label for="message" class="form-label fw-bold">Message *</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                            <div class="invalid-feedback">Please enter your message.</div>
+                            <div class="form-text">Maximum 1000 characters</div>
+                        </div>
+                        <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="newsletter" name="newsletter">
+                                    <label class="form-check-label" for="newsletter">
+                                        Subscribe to our newsletter for updates
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-send me-2"></i>Send Message
+                                </button>
+                            </form>
+                        </div>
+                        <!-- Contact Info -->
+                        <div class="col-lg-4">
+                            <h3 class="fw-bold mb-4">Contact Information</h3>    
+                            <ul class="list-unstyled">
+                                <li class="mb-3">
+                                    <i class="bi bi-geo-alt-fill me-2"></i>
+                                    {{ params["blog_web_address"] }}
+                                </li>
+                                <li class="mb-3">
+                                    <i class="bi bi-envelope-fill me-2"></i>
+                                    <a href="mailto:{{ params["blog_web_email"] }}">{{ params["blog_web_email"] }}</a>    
+                                    </li>
+                                <li class="mb-3">
+                                    <i class="bi bi-phone-fill me-2"></i>
+                                    <a href="tel:{{ params["blog_web_phone"] }}">{{ params["blog_web_phone"] }}</a>
+                                    </li>
+                                </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 {% endblock %}

@@ -25,5 +25,5 @@ def upload_image(file, folder_name, current_img):
         filename = secure_filename(file.filename)
         unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{filename}"
         file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
-        return f'{folder_name}/{filename}'
+        return f'{folder_name}/{unique_filename}'
     return current_img
