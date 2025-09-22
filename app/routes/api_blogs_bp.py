@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, redirect, flash, abort
 from flask_login import login_required, current_user
-from flask_wtf.csrf import validate_csrf
+from flask_wtf.csrf import validate_csrf, ValidationError
 from app.models.posts import BlogPost
 from app.utils.uploader import upload_image
 from app.utils.helper import generate_slug
@@ -27,8 +27,16 @@ blogs_bp = Blueprint('api_blogs', __name__, url_prefix='/api')
 @login_required
 def create_update_post():
   try:
-    # Validate CSRF token
-    validate_csrf(request.headers.get('X-CSRFToken'))
+    # Validate CSRF token from header
+    csrf_token = request.headers.get('X-CSRFToken')
+    if not csrf_token:
+        return jsonify({'success': False, 'message': 'CSRF token missing'}), 400
+    
+    try:
+        validate_csrf(csrf_token)
+    except ValidationError:
+        return jsonify({'success': False, 'message': 'CSRF token invalid'}), 400
+    
     # Check if it's an update or create
     is_update = request.method == 'PUT'
     post_id = request.args.get('id') if is_update else None
@@ -42,10 +50,23 @@ def create_update_post():
         post.user_id = current_user.id
 
     # Get form data
-    post.title = request.form.get('title', '').strip()
-    post.excerpt = request.form.get('excerpt', '').strip()
-    post.content = request.form.get('content', '').strip()
-    post.category = request.form.get('category', '').strip()
+    title = request.form.get('title', '').strip()
+    excerpt = request.form.get('excerpt', '').strip()
+    content = request.form.get('content', '').strip()
+    category = request.form.get('category', '').strip()
+    
+    # Validate required fields
+    if not title:
+        return jsonify({'success': False, 'message': 'Title is required'}), 400
+    if not content:
+        return jsonify({'success': False, 'message': 'Content is required'}), 400
+    if not category:
+        return jsonify({'success': False, 'message': 'Category is required'}), 400
+    
+    post.title = title
+    post.excerpt = excerpt
+    post.content = content
+    post.category = category
     # post.tags = request.form.get('tags', '')
     post.slug = request.form.get('slug', '').strip()
     post.meta_description = request.form.get('meta_description', '').strip()
@@ -64,4 +85,6 @@ def create_update_post():
     db.session.commit()
     return jsonify({'success': True, 'message': 'Post created successfully', 'post_slug': post.slug}), 200
   except Exception as e:
-    return jsonify({'success': False, 'message': str(e)}), 500
+    db.session.rollback()
+    print(f"Error creating post: {str(e)}")  # For debugging
+    return jsonify({'success': False, 'message': f'Error creating post: {str(e)}'}), 500
