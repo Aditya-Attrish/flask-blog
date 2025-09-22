@@ -1,5 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
-from flask_login import login_user, login_required, logout_user, current_user
+from flask import Blueprint, render_template, request, url_for
 from app.models.posts import BlogPost
 from app.models.contact import Contact
 from app.extensions import db, params
@@ -89,4 +88,9 @@ def about():
 @main_bp.route('/post/<slug>')
 def post(slug):
     post = BlogPost.query.filter_by(slug=slug).first_or_404()
+
+    # view count
+    post.views += 1
+    db.session.commit()
+    
     return render_template('post.html', post=post, params=params)

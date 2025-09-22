@@ -139,7 +139,7 @@
                             <label class="form-label fw-bold">Featured Image</label>
                             <div class="featured-image-preview mb-3" id="imagePreview" onclick="document.getElementById('featuredImage').click()">
                                 {% if post and post.thumbnail %}
-                                    <img src="{{ url_for('static', filename='thumbnail/' + post.thumbnail) }}" alt="Featured image" id="previewImg">
+                                    <img src="{{ url_for('static', filename=post.thumbnail) }}" alt="{{ post.thumbnail }}" id="previewImg">
                                 {% else %}
                                     <div class="placeholder">
                                         <i class="bi bi-camera fs-1 mb-2"></i>

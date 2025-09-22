@@ -2,7 +2,8 @@ from flask import Blueprint, jsonify, request, redirect, flash, abort
 from flask_login import login_required, current_user
 from flask_wtf.csrf import validate_csrf, ValidationError
 from app.models.posts import BlogPost
-from app.utils.uploader import upload_image
+from app.models.comment import Comment
+from app.utils.uploader import upload_image, remove_image
 from app.utils.helper import generate_slug
 from app.extensions import db
 
@@ -23,7 +24,7 @@ blogs_bp = Blueprint('api_blogs', __name__, url_prefix='/api')
 #         abort(404)
 #     return render_template('post.html', post=post, params=params)
 
-@blogs_bp.route('/blogs', methods=['POST'])
+@blogs_bp.route('/blogs', methods=['POST', 'PUT'])
 @login_required
 def create_update_post():
   try:
@@ -105,3 +106,34 @@ def create_update_post():
     db.session.rollback()
     print(f"Error creating post: {str(e)}")  # For debugging
     return jsonify({'success': False, 'message': f'Error creating post: {str(e)}'}), 500
+
+@blogs_bp.route('/deletePost/<int:post_sno>', methods=['DELETE'])
+@login_required
+def deletePost(post_sno):
+    post = BlogPost.query.get_or_404(post_sno)
+    if not post:
+        return jsonify({ 'success': False, 'message': "Post not found"}), 404
+    # Check if the current user is the author of the post
+    if post.user_id != current_user.id:
+        return jsonify({ 'success': False, 'message': "You are not authorized to delete this post"}), 403
+
+    remove_image(post.thumbnail)
+
+    db.session.delete(post)
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': "Post deleted successfully"}), 200
+    
+@blogs_bp.route('/comment', methods=['POST']')
+@login_required
+def add_comment():
+    # Get the form data
+    post_sno = request.form.get('post_sno')
+    comment = request.form.get('comment')
+    # Create a new comment object
+    new_comment = Comment(post_sno=post_sno, comment=comment, user_id=current_user.id)
+    # Add the new comment to the database
+    db.session.add(new_comment)
+    db.session.commit()
+    # Redirect to the post page
+    return redirect(url_for('blogs.post', slug=post.slug))

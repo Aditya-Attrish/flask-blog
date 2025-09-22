@@ -89,10 +89,10 @@ table.dataTable {
                             <td>{{ post.views }}</td>
                             <td>{{ post.created_at.strftime('%Y-%m-%d') }}</td>
                             <td>
-                                <a href="/blog/{{ post.slug }}" target="_blank" class="action-btn btn btn-sm btn-outline-primary" title="View">
+                                <a href="/post/{{ post.slug }}" target="_blank" class="action-btn btn btn-sm btn-outline-primary" title="View">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="/admin/edit-post/{{ post.id }}" class="action-btn btn btn-sm btn-outline-success" title="Edit">
+                                <a href="/user/edit/{{ post.sno }}" class="action-btn btn btn-sm btn-outline-success" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                                         </a>
                                                         <button class="action-btn btn btn-sm btn-outline-danger delete-post" 

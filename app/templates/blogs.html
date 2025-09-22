@@ -194,7 +194,7 @@ read-time {
                                 <span class="category-badge badge bg-{{ post.category_color }}">
                                     {{ post.category }}
                                 </span>
-                                <img src="{{ post.image }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                                <img src="{{ url_for('static', filename=post.thumbnail) }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
                                 <div class="card-body">
                                     <h5 class="card-title fw-bold">{{ post.title }}</h5>
                                     <p class="card-text text-muted">{{ post.excerpt }}</p>
