@@ -124,16 +124,16 @@ def deletePost(post_sno):
 
     return jsonify({'success': True, 'message': "Post deleted successfully"}), 200
     
-@blogs_bp.route('/comment', methods=['POST']')
+@blogs_bp.route('/comment', methods=['POST'])
 @login_required
 def add_comment():
     # Get the form data
     post_sno = request.form.get('post_sno')
     comment = request.form.get('comment')
     # Create a new comment object
-    new_comment = Comment(post_sno=post_sno, comment=comment, user_id=current_user.id)
+    new_comment = Comment(text=comment, user_id=current_user.id, post_id=post_sno)
     # Add the new comment to the database
     db.session.add(new_comment)
     db.session.commit()
     # Redirect to the post page
-    return redirect(url_for('blogs.post', slug=post.slug))
+    return jsonify({'success': True, 'message': "Comment added successfully"})

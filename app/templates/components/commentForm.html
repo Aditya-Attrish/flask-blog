@@ -1,0 +1,43 @@
+<!-- Comment Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div id="post-sno" style="display: none">{{ post.sno }}</div>
+        <h5 class="card-title">Leave a Comment</h5>
+        <form id="myForm">
+            <div class="mb-3">
+                <textarea class="form-control" rows="4" placeholder="Join the discussion..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+    </div>
+</div>
+
+<script>    
+    // JavaScript code to handle the comment form submission
+    document.getElementById('myForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        // Get the comment text from the form
+        const formData = new FormData();
+        formData.append('comment', document.querySelector('textarea').value);
+        formData.append('post_sno',  document.querySelector('#post-sno'));
+
+        try {
+            // Send the comment text to the server
+            const response = await fetch('/api/comment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: formData
+            });
+            if (!response.ok)
+                throw new Error('Network response was not ok');
+            const data = await response.json();
+            console.log(data);
+        }
+        catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    });
+</script>

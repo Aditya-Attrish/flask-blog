@@ -172,18 +172,7 @@
                     <div class="mb-5">
                         <h3 class="fw-bold mb-4">{{ post.comments }} Comments</h3>
 
-                        <!-- Comment Form -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">Leave a Comment</h5>
-                                <form>
-                                    <div class="mb-3">
-                                        <textarea class="form-control" rows="4" placeholder="Join the discussion..."></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Post Comment</button>
-                                </form>
-                            </div>
-                        </div>
+                        {% include "components/commentForm.html" %}
 
                         <!-- Comments List -->
                         <div class="comment-list">
