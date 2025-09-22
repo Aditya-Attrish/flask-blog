@@ -72,6 +72,23 @@ def create_update_post():
     post.meta_description = request.form.get('meta_description', '').strip()
     post.status = request.form.get('status', 'draft')
     
+    # Handle publish_date based on status
+    from datetime import datetime
+    if post.status == 'publish':
+        post.publish_date = datetime.utcnow()
+    elif post.status == 'schedule':
+        # Get the scheduled date from form, or use current time as fallback
+        schedule_date = request.form.get('publish_date')
+        if schedule_date:
+            try:
+                post.publish_date = datetime.fromisoformat(schedule_date.replace('Z', '+00:00'))
+            except ValueError:
+                post.publish_date = datetime.utcnow()
+        else:
+            post.publish_date = datetime.utcnow()
+    else:  # draft status
+        post.publish_date = None
+    
   # Handle file upload
     if 'featured_image' in request.files:
       file = request.files['featured_image']
