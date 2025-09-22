@@ -87,10 +87,39 @@ def about():
 
 @main_bp.route('/post/<slug>')
 def post(slug):
+    from app.models.comment import Comment
+    from app.models.user import User
+    
     post = BlogPost.query.filter_by(slug=slug).first_or_404()
 
     # view count
     post.views += 1
     db.session.commit()
     
-    return render_template('post.html', post=post, params=params)
+    # Fetch comments with user information
+    comments = db.session.query(Comment, User).join(User, Comment.user_id == User.id).filter(Comment.post_id == post.sno).order_by(Comment.date_posted.desc()).all()
+    
+    # Format comments data
+    formatted_comments = []
+    for comment, user in comments:
+        formatted_comments.append({
+            'id': comment.id,
+            'content': comment.text,
+            'author': user.username,
+            'avatar': user.userImg,
+            'time': comment.date_posted.strftime('%B %d, %Y at %I:%M %p'),
+            'likes': 0  # You can add a likes field to Comment model later
+        })
+    
+    # Sample related posts (you can implement proper logic later)
+    related_posts = []
+    
+    # Sample popular posts (you can implement proper logic later) 
+    popular_posts = []
+    
+    return render_template('post.html', 
+                         post=post, 
+                         params=params,
+                         comments=formatted_comments,
+                         related_posts=related_posts,
+                         popular_posts=popular_posts)

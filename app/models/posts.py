@@ -14,11 +14,19 @@ class BlogPost(db.Model):
     thumbnail = db.Column(db.String(50),nullable=False)
     status = db.Column(db.String(40), nullable=False)
     views = db.Column(db.Integer, default=0)
-    comments = db.Column(db.Integer, default=0)
+    comments_count = db.Column(db.Integer, default=0)
     publish_date = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     comments = db.relationship('Comment', backref='post', lazy=True)
+    
+    @property
+    def author_avatar(self):
+        return self.author.userImg if self.author else '/static/userImg/default-user.jpg'
+    
+    @property 
+    def author_name(self):
+        return self.author.username if self.author else 'Unknown'
 
     def to_dict(self):
         return {

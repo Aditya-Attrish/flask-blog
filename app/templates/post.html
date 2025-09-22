@@ -53,16 +53,16 @@
 
                     <div class="d-flex justify-content-center align-items-center flex-wrap gap-4">
                         <div class="d-flex align-items-center">
-                            <img src="{{ post.author_avatar }}" class="author-avatar me-3" alt="{{ post.author }}">
+                            <img src="{{ url_for('static', filename=post.author_avatar) }}" class="author-avatar me-3" alt="{{ post.author_name }}">
                             <div>
-                                <h6 class="mb-0">{{ post.author }}</h6>
-                                <small>{{ post.date }} · {{ post.read_time }} min read</small>
+                                <h6 class="mb-0">{{ post.author_name }}</h6>
+                                <small>{{ post.created_at.strftime('%B %d, %Y') }} · 5 min read</small>
                             </div>
                         </div>
 
                         <div class="d-flex align-items-center">
                             <span class="me-3"><i class="bi bi-eye me-1"></i> {{ post.views }} views</span>
-                            <span><i class="bi bi-chat me-1"></i> {{ post.comments }} comments</span>
+                            <span><i class="bi bi-chat me-1"></i> {{ comments|length }} comments</span>
                         </div>
                     </div>
                 </div>
@@ -124,11 +124,11 @@
                     <div class="author-card mb-5">
                         <div class="row align-items-center">
                             <div class="col-auto">
-                                <img src="{{ post.author_avatar }}" class="author-avatar" alt="{{ post.author }}">
+                                <img src="{{ url_for('static', filename=post.author_avatar) }}" class="author-avatar" alt="{{ post.author_name }}">
                             </div>
                             <div class="col">
-                                <h4 class="fw-bold">{{ post.author }}</h4>
-                                <p class="text-muted mb-2">Senior AI Researcher with 10+ years of experience in machine learning and deep learning applications.</p>
+                                <h4 class="fw-bold">{{ post.author_name }}</h4>
+                                <p class="text-muted mb-2">Content creator sharing insights and knowledge through engaging articles.</p>
                                 <div class="d-flex gap-2">
                                     <a href="#" class="btn btn-outline-primary btn-sm">View Profile</a>
                                     <a href="#" class="btn btn-outline-secondary btn-sm">Follow</a>
@@ -170,30 +170,39 @@
 
                     <!-- Comments Section -->
                     <div class="mb-5">
-                        <h3 class="fw-bold mb-4">{{ post.comments }} Comments</h3>
+                        <h3 class="fw-bold mb-4">{{ comments|length }} Comments</h3>
+                        
+                        <!-- Hidden post ID for comment form -->
+                        <div id="post-sno" style="display: none;">{{ post.sno }}</div>
 
                         {% include "components/commentForm.html" %}
 
                         <!-- Comments List -->
-                        <div class="comment-list">
-                            {% for comment in post.comments %}
-                            <div class="d-flex mb-4">
-                                <img src="{{ comment.avatar }}" class="author-avatar me-3" alt="{{ comment.author }}">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <h6 class="fw-bold mb-0">{{ comment.author }}</h6>
-                                        <small class="text-muted">{{ comment.time }}</small>
-                                    </div>
-                                    <p class="mb-2">{{ comment.content }}</p>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-outline-secondary">
-                                            <i class="bi bi-hand-thumbs-up"></i> {{ comment.likes }}
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-secondary">Reply</button>
+                        <div class="comment-list mt-4">
+                            {% if comments %}
+                                {% for comment in comments %}
+                                <div class="d-flex mb-4">
+                                    <img src="{{ url_for('static', filename=comment.avatar) }}" class="author-avatar me-3" alt="{{ comment.author }}">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold mb-0">{{ comment.author }}</h6>
+                                            <small class="text-muted">{{ comment.time }}</small>
+                                        </div>
+                                        <p class="mb-2">{{ comment.content }}</p>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-hand-thumbs-up"></i> {{ comment.likes }}
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary">Reply</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            {% endfor %}
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <p class="text-muted">No comments yet. Be the first to comment!</p>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
