@@ -29,7 +29,7 @@
         </button>
       </form>
         {% if current_user.is_authenticated %}
-                <a class="my-2 my-sm-0" href="{{ url_for('user.admin') }}"><img src="{{ url_for('static', filename=current_user.userImg) }}" alt="Author Photo" class="img-fluid rounded-circle" style="width: 30px; height: 30px;"></a>
+                <a class="my-2 my-sm-0" href="{{ url_for('user.admin') }}"><img src="{{ url_for('static', filename=current_user.userImg) }}" alt="Author Photo" class="img-fluid rounded-circle" loading="lazy" style="width: 30px; height: 30px;"></a>
             {% else %}
                 <div>
                     <a class="btn btn-outline-primary me-2" href="{{ url_for('auth.login') }}">Login</a>

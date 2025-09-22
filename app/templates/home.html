@@ -96,10 +96,10 @@
                         </div>
                         <div class="card-footer bg-transparent border-0">
                             <div class="d-flex align-items-center">
-                                <img src="{{ post.author_avatar }}" 
+                                <img src="{{ post.author.userImg }}" 
                                      class="author-avatar me-2" alt="Author">
                                 <div>
-                                    <small class="text-muted">{{ post.author_name }}</small>
+                                    <small class="text-muted">{{ post.author.username }}</small>
                                     <br>
                                     <small class="text-muted">{{ post.created_at.strftime('%b %d, %Y') }} · {{ (post.content|length / 200)|round|int }} min read</small>
                                 </div>
@@ -143,9 +143,9 @@
                         <div class="card-footer bg-transparent border-0">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
-                                    <img src="{{ post.author_avatar }}" 
+                                    <img src="{{ post.author.userImg }}" 
                                          class="author-avatar me-2" alt="Author">
-                                    <small class="text-muted">{{ post.author_name }}</small>
+                                    <small class="text-muted">{{ post.author.username }}</small>
                                 </div>
                                 <small class="text-muted">{{ post.created_at.strftime('%b %d') }}</small>
                             </div>

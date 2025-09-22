@@ -124,7 +124,7 @@
                     <div class="author-card mb-5">
                         <div class="row align-items-center">
                             <div class="col-auto">
-                                <img src="{{ url_for('static', filename=post.author_avatar) }}" class="author-avatar" alt="{{ post.author_name }}">
+                                <img src="{{ url_for('static', filename=post.author.userImg) }}" class="author-avatar" alt="{{ post.author.username }}">
                             </div>
                             <div class="col">
                                 <h4 class="fw-bold">{{ post.author_name }}</h4>
