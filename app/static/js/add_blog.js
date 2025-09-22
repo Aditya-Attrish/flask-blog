@@ -80,9 +80,9 @@ class AddNewBlog {
         try {
             const formData = new FormData();
             
-            formData.append('title', event.target.title.value);
-            formData.append('excerpt', event.target.excerpt.value);
-            formData.append('category', event.target.category.value);
+            formData.append('title', this.postTitle.value);
+            formData.append('excerpt', this.postExcerpt.value);
+            formData.append('category', this.postCategory.value);
             // formData.append('tags', this.postTags.value);
             // formData.append('slug', this.postSlug.value);
             // formData.append('meta_description', this.postMeta.value);
@@ -97,7 +97,6 @@ class AddNewBlog {
                 headers: {
                     'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Accept': 'application/json'
-                    
                 },
                 body: formData
             });

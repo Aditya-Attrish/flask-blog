@@ -23,8 +23,8 @@ blogs_bp = Blueprint('api/blogs', __name__)
 #     return render_template('post.html', post=post, params=params)
 
 @blogs_bp.route('/', methods=['POST'])
+@login_required
 def create_update_post():
-  return jsonify({'success': False, 'message': 'Post not created successfully'}), 500
   try:
     # Check if it's an update or create
     is_update = request.method == 'PUT'
