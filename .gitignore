@@ -1,5 +1,6 @@
 *.pyc
 *pyo
+node_modules/
 .replit
 __pycache__/
 venv/
