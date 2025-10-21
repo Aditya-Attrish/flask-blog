@@ -1,0 +1,702 @@
+{% extends "components/layout.html" %}
+    {% block title %}{{ user.full_name }} - {{ params["blog_web_name"] }} {% endblock %}
+    {% block head %}
+    <style>
+        .profile-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .avatar-container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            line-height: 1;
+        }
+
+        .post-card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .post-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .category-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 2;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            color: #495057;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .social-link.twitter:hover { background: #1da1f2; color: white; }
+        .social-link.linkedin:hover { background: #0077b5; color: white; }
+        .social-link.github:hover { background: #333; color: white; }
+        .social-link.instagram:hover { background: #e4405f; color: white; }
+        .social-link.website:hover { background: #667eea; color: white; }
+
+        .tab-content {
+            min-height: 400px;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .follow-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .follow-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+    </style>
+    {% endblock %}
+    {% block body %}
+    <!-- Profile Hero Section -->
+    <section class="profile-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center text-md-start">
+                    <div class="avatar-container">
+                        <img src="{{ url_for('static', filename=user.avatar) }}" 
+                             alt="{{ user.full_name }}" 
+                             class="profile-avatar">
+                    </div>
+                </div>
+
+                <div class="col-md-6 text-center text-md-start">
+                    <div class="avatar-container">
+                        <h1 class="display-5 fw-bold mb-2">{{ user.full_name }}</h1>
+                        <p class="lead mb-3">@{{ user.username }}</p>
+
+                        {% if user.bio %}
+                        <p class="mb-3">{{ user.bio }}</p>
+                        {% endif %}
+
+                        {% if user.location %}
+                        <p class="mb-3">
+                            <i class="bi bi-geo-alt"></i> {{ user.location }}
+                        </p>
+                        {% endif %}
+
+                        <!-- Social Links -->
+                        <div class="d-flex gap-2 justify-content-center justify-content-md-start">
+                            {% if user.website %}
+                            <a href="{{ user.website }}" class="social-link website" target="_blank" title="Website">
+                                <i class="bi bi-globe"></i>
+                            </a>
+                            {% endif %}
+
+                            {% if user.twitter_url %}
+                            <a href="{{ user.twitter_url }}" class="social-link twitter" target="_blank" title="Twitter">
+                                <i class="bi bi-twitter"></i>
+                            </a>
+                            {% endif %}
+
+                            {% if user.linkedin_url %}
+                            <a href="{{ user.linkedin_url }}" class="social-link linkedin" target="_blank" title="LinkedIn">
+                                <i class="bi bi-linkedin"></i>
+                            </a>
+                            {% endif %}
+
+                            {% if user.github_url %}
+                            <a href="{{ user.github_url }}" class="social-link github" target="_blank" title="GitHub">
+                                <i class="bi bi-github"></i>
+                            </a>
+                            {% endif %}
+
+                            {% if user.instagram_url %}
+                            <a href="{{ user.instagram_url }}" class="social-link instagram" target="_blank" title="Instagram">
+                                <i class="bi bi-instagram"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 text-center text-md-end">
+                    <div class="avatar-container">
+                        {% if current_user.is_authenticated and current_user.id != user.id %}
+                        <button class="btn follow-btn mb-3">
+                            <i class="bi bi-plus"></i> Follow
+                        </button>
+                        {% endif %}
+
+                        {% if current_user.is_authenticated and current_user.id == user.id %}
+                        <a href="{{ url_for('user.edit_profile') }}" class="btn follow-btn mb-3">
+                            <i class="bi bi-pencil"></i> Edit Profile
+                        </a>
+                        {% endif %}
+
+                        <p class="small mb-0">
+                            <i class="bi bi-calendar"></i> 
+                            Member since {{ stats.member_since }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-number">{{ stats.total_posts }}</div>
+                        <div class="text-muted">Articles Published</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-number">{{ "{:,}".format(stats.total_views) }}</div>
+                        <div class="text-muted">Total Views</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-number">{{ "{:,}".format(stats.total_likes) }}</div>
+                        <div class="text-muted">Total Likes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Popular Posts -->
+                    {% if popular_posts %}
+                    <div class="card mb-4">
+                        <div class="card-header bg-white">
+                            <h5 class="fw-bold mb-0">Popular Posts</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for post in popular_posts %}
+                            <div class="d-flex mb-3 pb-3 border-bottom">
+                                <img src="{{ post.thumbnail }}" 
+                                     alt="{{ post.title }}"
+                                     class="rounded me-3" 
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                <div>
+                                    <h6 class="fw-bold mb-1">
+                                        <a href="{{ url_for('/.post', slug=post.slug) }}" 
+                                           class="text-decoration-none text-dark">
+                                            {{ post.title|truncate(40) }}
+                                        </a>
+                                    </h6>
+                                    <div class="d-flex align-items-center text-muted small">
+                                        <span><i class="bi bi-eye"></i> {{ post.views }}</span>
+                                        <span class="ms-2"><i class="bi bi-heart"></i> {{ post.likes }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    <!-- Navigation Tabs -->
+                    <ul class="nav nav-pills mb-4" id="profileTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#posts" data-bs-toggle="tab">
+                                <i class="bi bi-file-text me-1"></i> Posts 
+                                <span class="badge bg-secondary ms-1">{{ stats.total_posts }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#about" data-bs-toggle="tab">
+                                <i class="bi bi-person me-1"></i> About
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Posts Tab -->
+                        <div class="tab-pane fade show active" id="posts">
+                            <!-- Filters -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <span class="text-muted" id="postsCount">
+                                        Showing {{ posts.total }} articles
+                                    </span>
+                                </div>
+                                <div>
+                                    <select class="form-select form-select-sm" id="sortSelect">
+                                        <option value="newest">Newest First</option>
+                                        <option value="popular">Most Popular</option>
+                                        <option value="oldest">Oldest First</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Posts Grid -->
+                            <div class="row" id="postsGrid">
+                                {% for post in posts.items %}
+                                <div class="col-md-6 mb-4">
+                                    <div class="card post-card">
+                                        <div class="position-relative">
+                                            <img src="{{ url_for('static', filename=post.thumbnail) }}" 
+                                                 class="card-img-top" 
+                                                 alt="{{ post.title }}"
+                                                 style="height: 200px; object-fit: cover;">
+                                            <span class="category-badge badge bg-primary">
+                                                {{ post.category }}
+                                            </span>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title fw-bold">
+                                                <a href="{{ url_for('/.post', slug=post.slug) }}" 
+                                                   class="text-decoration-none text-dark">
+                                                    {{ post.title }}
+                                                </a>
+                                            </h5>
+                                            <p class="card-text text-muted small">
+                                                {{ post.excerpt|truncate(100) }}
+                                            </p>
+                                        </div>
+                                        <div class="card-footer bg-transparent border-0">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">
+                                                    {{ post.publish_date.strftime('%b %d, %Y') }}
+                                                </small>
+                                                <div class="d-flex align-items-center text-muted">
+                                                    <small class="me-2">
+                                                        <i class="bi bi-eye"></i> {{ post.views }}
+                                                    </small>
+                                                    <small>
+                                                        <i class="bi bi-heart"></i> {{ post.likes }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="col-12">
+                                    <div class="empty-state">
+                                        <i class="bi bi-file-text display-1"></i>
+                                        <h4 class="mt-3">No Posts Yet</h4>
+                                        <p>This user hasn't published any articles yet.</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Pagination -->
+                            {% if posts.pages > 1 %}
+                            <nav aria-label="Posts pagination" class="mt-5">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item {% if not posts.has_prev %}disabled{% endif %}">
+                                        <a class="page-link" 
+                                           href="{{ url_for('user.profile', username=user.username, page=posts.prev_num) if posts.has_prev else '#' }}">
+                                            Previous
+                                        </a>
+                                    </li>
+
+                                    {% for page_num in posts.iter_pages(left_edge=2, left_current=2, right_current=2, right_edge=2) %}
+                                        {% if page_num %}
+                                            <li class="page-item {% if page_num == posts.page %}active{% endif %}">
+                                                <a class="page-link" 
+                                                   href="{{ url_for('user.profile', username=user.username, page=page_num) }}">
+                                                    {{ page_num }}
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    <li class="page-item {% if not posts.has_next %}disabled{% endif %}">
+                                        <a class="page-link" 
+                                           href="{{ url_for('user.profile', username=user.username, page=posts.next_num) if posts.has_next else '#' }}">
+                                            Next
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            {% endif %}
+
+                            <!-- Loading Spinner -->
+                            <div class="loading-spinner" id="postsLoading">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading posts...</p>
+                            </div>
+                        </div>
+
+                        <!-- About Tab -->
+                        <div class="tab-pane fade" id="about">
+                            <div class="card">
+                                <div class="card-body">
+                                    {% if user.bio %}
+                                    <h5 class="fw-bold mb-3">About</h5>
+                                    <p class="mb-4">{{ user.bio }}</p>
+                                    {% endif %}
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="fw-bold mb-3">Profile Information</h6>
+                                            <dl class="row">
+                                                {% if user.location %}
+                                                <dt class="col-sm-4">Location</dt>
+                                                <dd class="col-sm-8">{{ user.location }}</dd>
+                                                {% endif %}
+
+                                                <dt class="col-sm-4">Member since</dt>
+                                                <dd class="col-sm-8">{{ stats.member_since }}</dd>
+
+                                                <dt class="col-sm-4">Last active</dt>
+                                                <dd class="col-sm-8">{{ stats.last_active }}</dd>
+                                            </dl>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <h6 class="fw-bold mb-3">Statistics</h6>
+                                            <dl class="row">
+                                                <dt class="col-sm-6">Total posts</dt>
+                                                <dd class="col-sm-6">{{ stats.total_posts }}</dd>
+
+                                                <dt class="col-sm-6">Total views</dt>
+                                                <dd class="col-sm-6">{{ "{:,}".format(stats.total_views) }}</dd>
+
+                                                <dt class="col-sm-6">Total likes</dt>
+                                                <dd class="col-sm-6">{{ "{:,}".format(stats.total_likes) }}</dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+
+                                    {% if user.website or user.twitter_url or user.linkedin_url or user.github_url or user.instagram_url %}
+                                    <h6 class="fw-bold mb-3">Connect</h6>
+                                    <div class="d-flex gap-2">
+                                        {% if user.website %}
+                                        <a href="{{ user.website }}" class="social-link website" target="_blank" title="Website">
+                                            <i class="bi bi-globe"></i>
+                                        </a>
+                                        {% endif %}
+
+                                        {% if user.twitter_url %}
+                                        <a href="{{ user.twitter_url }}" class="social-link twitter" target="_blank" title="Twitter">
+                                            <i class="bi bi-twitter"></i>
+                                        </a>
+                                        {% endif %}
+
+                                        {% if user.linkedin_url %}
+                                        <a href="{{ user.linkedin_url }}" class="social-link linkedin" target="_blank" title="LinkedIn">
+                                            <i class="bi bi-linkedin"></i>
+                                        </a>
+                                        {% endif %}
+
+                                        {% if user.github_url %}
+                                        <a href="{{ user.github_url }}" class="social-link github" target="_blank" title="GitHub">
+                                            <i class="bi bi-github"></i>
+                                        </a>
+                                        {% endif %}
+
+                                        {% if user.instagram_url %}
+                                        <a href="{{ user.instagram_url }}" class="social-link instagram" target="_blank" title="Instagram">
+                                            <i class="bi bi-instagram"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endblock %}
+    {% block scripts %}
+    <script>
+        class PublicProfile {
+            constructor() {
+                this.currentPage = 1;
+                this.currentCategory = '';
+                this.currentSort = 'newest';
+                this.isLoading = false;
+
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.setupInfiniteScroll();
+            }
+
+            setupEventListeners() {
+                // Sort change
+                document.getElementById('sortSelect').addEventListener('change', (e) => {
+                    this.currentSort = e.target.value;
+                    this.loadPosts(1, true);
+                });
+
+                // Category filter
+                document.querySelectorAll('.category-filter').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.currentCategory = link.dataset.category;
+                        this.loadPosts(1, true);
+
+                        // Update active category
+                        document.querySelectorAll('.category-filter').forEach(l => {
+                            l.classList.remove('bg-primary', 'text-white');
+                            l.classList.add('bg-light', 'text-dark');
+                        });
+                        link.classList.remove('bg-light', 'text-dark');
+                        link.classList.add('bg-primary', 'text-white');
+                    });
+                });
+
+                // Tab change
+                const tabLinks = document.querySelectorAll('#profileTabs .nav-link');
+                tabLinks.forEach(link => {
+                    link.addEventListener('shown.bs.tab', (e) => {
+                        // Update URL without reload
+                        const tabName = e.target.getAttribute('href').substring(1);
+                        history.replaceState(null, '', `#${tabName}`);
+                    });
+                });
+
+                // Restore tab from URL hash
+                const hash = window.location.hash.substring(1);
+                if (hash && (hash === 'posts' || hash === 'about')) {
+                    const tab = document.querySelector(`[href="#${hash}"]`);
+                    if (tab) {
+                        new bootstrap.Tab(tab).show();
+                    }
+                }
+            }
+
+            setupInfiniteScroll() {
+                // Load more posts when scrolling to bottom
+                window.addEventListener('scroll', () => {
+                    if (this.isLoading) return;
+
+                    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+                    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+
+                    if (distanceFromBottom < 500) {
+                        this.loadPosts(this.currentPage + 1);
+                    }
+                });
+            }
+
+            async loadPosts(page = 1, reset = false) {
+                if (this.isLoading) return;
+
+                this.isLoading = true;
+                this.showLoading(true);
+
+                try {
+                    const params = new URLSearchParams({
+                        page: page,
+                        per_page: 12,
+                        category: this.currentCategory,
+                        sort: this.currentSort
+                    });
+
+                    const response = await fetch(`/api/user/{{ user.username }}/posts?${params}`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        if (reset) {
+                            document.getElementById('postsGrid').innerHTML = '';
+                        }
+
+                        this.renderPosts(result.posts);
+                        this.updatePagination(result.pagination);
+
+                        if (reset) {
+                            this.currentPage = 1;
+                        } else {
+                            this.currentPage = result.pagination.page;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading posts:', error);
+                } finally {
+                    this.isLoading = false;
+                    this.showLoading(false);
+                }
+            }
+
+            renderPosts(posts) {
+                const grid = document.getElementById('postsGrid');
+
+                if (posts.length === 0 && this.currentPage === 1) {
+                    grid.innerHTML = `
+                        <div class="col-12">
+                            <div class="empty-state">
+                                <i class="bi bi-file-text display-1"></i>
+                                <h4 class="mt-3">No Posts Found</h4>
+                                <p>No articles match your current filters.</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                posts.forEach(post => {
+                    const postElement = this.createPostElement(post);
+                    grid.appendChild(postElement);
+                });
+            }
+
+            createPostElement(post) {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 mb-4';
+
+                col.innerHTML = `
+                    <div class="card post-card">
+                        <div class="position-relative">
+                            <img src="${post.thumbnail}" 
+                                 class="card-img-top" 
+                                 alt="${post.title}"
+                                 style="height: 200px; object-fit: cover;">
+                            <span class="category-badge badge bg-primary">
+                                ${post.category}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">
+                                <a href="/blog/${post.slug}" class="text-decoration-none text-dark">
+                                    ${post.title}
+                                </a>
+                            </h5>
+                            <p class="card-text text-muted small">
+                                ${post.excerpt}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">${post.publish_date}</small>
+                                <div class="d-flex align-items-center text-muted">
+                                    <small class="me-2">
+                                        <i class="bi bi-eye"></i> ${post.views}
+                                    </small>
+                                    <small>
+                                        <i class="bi bi-heart"></i> ${post.likes}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                return col;
+            }
+
+            updatePagination(pagination) {
+                const countElement = document.getElementById('postsCount');
+                if (countElement) {
+                    countElement.textContent = `Showing ${pagination.total} articles`;
+                }
+            }
+
+            showLoading(show) {
+                const spinner = document.getElementById('postsLoading');
+                if (spinner) {
+                    spinner.style.display = show ? 'block' : 'none';
+                }
+            }
+        }
+
+        // Initialize public profile
+        document.addEventListener('DOMContentLoaded', function() {
+            window.publicProfile = new PublicProfile();
+        });
+    </script>
+{% endblock %}

@@ -3,6 +3,7 @@ from app import create_app
 from app.extensions import db
 from app.models.posts import BlogPost
 from app.models.user import User
+from app.models.category import Category
 from datetime import datetime, timedelta
 import random
 
@@ -18,7 +19,7 @@ def add_sample_posts():
             sample_user = User(
                 username="admin",
                 email="admin@example.com",
-                userImg="userImg/default-user.jpg"
+                avatar="userImg/default-user.jpg"
             )
             sample_user.set_password("password123")
             db.session.add(sample_user)
@@ -178,6 +179,24 @@ def add_sample_posts():
                 "status": "published"
             }
         ]
+
+        for data in sample_posts:
+            # create category if not exists with name, icom, description
+            category_icons = {
+                    'Technology': 'laptop',
+                    'Lifestyle': 'heart',
+                    'Travel': 'geo-alt',
+                    'Business': 'graph-up',
+                    'Health': 'activity',
+                    'Education': 'book',
+                    'Design': 'palette',
+                    'Programming': 'code-slash'
+            }
+            category = Category.query.filter_by(name=data["category"]).first()
+            if not category:
+                category = Category(name=data["category"], icon=category_icons[data["category"]], description=data["category"])
+                db.session.add(category)
+                db.session.commit()
         
         # Generate slugs and add posts
         for i, post_data in enumerate(sample_posts):
@@ -192,6 +211,8 @@ def add_sample_posts():
                 print(f"Post with slug '{slug}' already exists, skipping...")
                 continue
             
+            category = Category.query.filter_by(name=post_data["category"]).first_or_404()
+            post_data["category_id"] = category.id
             # Create random publish date within last 30 days
             days_ago = random.randint(1, 30)
             publish_date = datetime.utcnow() - timedelta(days=days_ago)
@@ -202,7 +223,7 @@ def add_sample_posts():
                 excerpt=post_data["excerpt"],
                 slug=slug,
                 content=post_data["content"],
-                category=post_data["category"],
+                category_id=post_data["category_id"],
                 meta_description=post_data["meta_description"],
                 thumbnail=post_data["thumbnail"],
                 status=post_data["status"],

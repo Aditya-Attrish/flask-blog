@@ -1,54 +1,58 @@
-from flask import Blueprint, render_template, request, redirect, flash, url_for
-from flask_login import login_user, login_required, logout_user
+from flask import Blueprint, current_app, render_template, redirect, flash, url_for
+from flask_login import current_user, login_user, login_required, logout_user
+from app.forms.auth_valid import LoginForm, RegistrationForm
 from app.models.user import User
-from app.extensions import db, params
+from app.extensions import params
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == 'POST':
-        user = request.form['username']
-        pas = request.form['password']
-        remember = request.form.get('remember', '')
-
-        usern = User.query.filter_by(username=user).first()
-        if usern and usern.check_password(pas):
-            login_user(usern, remember=remember == "on")
-            return redirect('/user')
-    return render_template("login.html", params=params)
+    if current_user.is_authenticated:
+        return redirect(url_for('user.admin'))
+    
+    form = LoginForm()
+    if form.validate_on_submit():
+        try:
+            # Find user by username or email
+            user = User.query.filter(
+                (User.username == form.username.data) | 
+                (User.email == form.username.data)
+            ).first()
+            if user and user.check_password(form.password.data):
+                login_user(user, remember=form.remember_me.data)
+                return redirect(url_for('user.admin'))
+            else:
+                flash('Invalid username or password', 'danger')
+        except Exception as e:
+            current_app.logger.error(f"Error during login: {e}")
+            flash('An error occurred during login. Please try again.', 'danger')
+    return render_template("login.html", params=params, form=form)
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
-    if request.method == 'POST':
-        email = request.form['emailId']
-        usern = request.form['username']
-        pas = request.form['password']
-        remember = request.form['remember']
-        confirm_password = request.form['confirm_password']
-
-        # Check if the username is already taken
-        existing_user = User.query.filter_by(username=usern).first()
-        if existing_user:
-            flash(
-                'Username already taken. Please choose a different username.',
-                'danger')
-            return redirect('/register')
-
-        if pas != confirm_password:
-            flash('Passwords do not match. Please try again.', 'danger')
-            return redirect('/register')
-
-        user = User(email=email, username=usern, password=pas)
-        # Hashing a password
-        user.password = user.set_password(pas)
-        db.session.add(user)
-        db.session.commit()
-
-        login_user(user, remember=remember == "on")
+    if current_user.is_authenticated:
         return redirect(url_for('user.admin'))
-    return render_template("register.html", params=params)
+
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        try:
+            if form.confirm_password.data != form.password.data:
+                raise ValueError("Passwords do not match")
+            
+            user = User.create_user(
+                username=form.username.data,
+                email=form.email.data,
+                password=form.password.data
+            )
+            if not user:
+                raise ValueError("Failed to create user")
+            login_user(user)
+            return redirect(url_for('user.admin'))
+        except Exception as e:
+            flash(f'An error occurred during registration {e}. Please try again.', 'danger')
+    return render_template("register.html", params=params, form=form)
 
 @auth_bp.route('/logout')
 @login_required

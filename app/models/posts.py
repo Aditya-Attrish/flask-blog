@@ -8,7 +8,7 @@ class BlogPost(db.Model):
     excerpt = db.Column(db.String(300), nullable=False)
     slug = db.Column(db.String(255), nullable=False)
     title = db.Column(db.String(120), nullable=False)
-    category = db.Column(db.String(50), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     meta_description = db.Column(db.String(160), nullable=False)
     thumbnail = db.Column(db.String(50),nullable=False)

@@ -1,7 +1,16 @@
 {% extends "components/layout.html" %}
 {% block title %}{{ post.title }} - {{ params["blog_web_name"] }} {% endblock %}
 
-{% block styles %}
+{% block head %}
+<!-- add meta description  -->
+<meta name="description" content="{{ post.meta_description }}">
+<style>
+    .author-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
 .blog-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -24,6 +33,7 @@
     margin: 2rem 0 1rem 0;
     color: var(--dark-color);
 }
+</style>
 
 {% endblock %}
 
@@ -34,7 +44,7 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Home</a></li>
                 <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Blog</a></li>
-                <li class="breadcrumb-item"><a href="#" class="text-decoration-none">{{ post.category }}</a></li>
+                <li class="breadcrumb-item"><a href="#" class="text-decoration-none">{{ post.category.name }}</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
             </ol>
         </nav>
@@ -46,7 +56,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8 text-center">
                     <div class="mb-3">
-                        <span class="badge bg-light text-dark fs-6">{{ post.category }}</span>
+                        <span class="badge bg-light text-dark fs-6">{{ post.category.name }}</span>
                     </div>
                     <h1 class="display-4 fw-bold mb-4">{{ post.title }}</h1>
                     <p class="lead mb-4">{{ post.excerpt }}</p>
@@ -124,13 +134,13 @@
                     <div class="author-card mb-5">
                         <div class="row align-items-center">
                             <div class="col-auto">
-                                <img src="{{ url_for('static', filename=post.author.userImg) }}" class="author-avatar" alt="{{ post.author.username }}">
+                                <img src="{{ url_for('static', filename=post.author.avatar) }}" class="object-fit-cover rounded-circle" style="width: 35px; height: 35px;" alt="{{ post.author.first_name }}">
                             </div>
                             <div class="col">
-                                <h4 class="fw-bold">{{ post.author_name }}</h4>
+                                <h4 class="fw-bold">{{ post.author.username }}</h4>
                                 <p class="text-muted mb-2">Content creator sharing insights and knowledge through engaging articles.</p>
                                 <div class="d-flex gap-2">
-                                    <a href="#" class="btn btn-outline-primary btn-sm">View Profile</a>
+                                    <a href="{{ url_for('user.profile', username=post.author.username) }}" class="btn btn-outline-primary btn-sm">View Profile</a>
                                     <a href="#" class="btn btn-outline-secondary btn-sm">Follow</a>
                                 </div>
                             </div>
@@ -182,7 +192,7 @@
                             {% if comments %}
                                 {% for comment in comments %}
                                 <div class="d-flex mb-4">
-                                    <img src="{{ url_for('static', filename=comment.avatar) }}" class="author-avatar me-3" alt="{{ comment.author }}">
+                                    <img src="{{ url_for('static', filename=comment.avatar) }}" class="object-fit-cover me-3 rounded-circle" style="width: 35px; height: 35px;" alt="{{ comment.author }}">
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <h6 class="fw-bold mb-0">{{ comment.author }}</h6>

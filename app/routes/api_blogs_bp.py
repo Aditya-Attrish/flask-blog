@@ -10,20 +10,6 @@ from app.extensions import db
 
 blogs_bp = Blueprint('api_blogs', __name__, url_prefix='/api')
 
-# @blogs_bp.route('/')
-# def index():
-#     # Fetch all blog posts with status 'published', order by publish_date and paginate
-#     page = request.args.get('page', 1, type=int)
-#     posts = BlogPost.query.filter_by(status='published').order_by(BlogPost.publish_date.desc()).paginate(page=page, per_page=params['post_per_page'])
-#     return render_template('blogs.html', posts=posts, params=params)
-
-# @blogs_bp.route('/post/<string:slug>')
-# def post(slug):
-#     post = BlogPost.query.filter_by(slug=slug).first()
-#     if not post:
-#         abort(404)
-#     return render_template('post.html', post=post, params=params)
-
 @blogs_bp.route('/blogs', methods=['POST', 'PUT'])
 @login_required
 def create_update_post():

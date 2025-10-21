@@ -53,10 +53,10 @@
                 <p class="text-muted">Try different keywords or browse our categories</p>
 
                 <div class="mt-4">
-                    <a href="{{ url_for('blog.categories') }}" class="btn btn-primary me-2">
+                    <a href="#" class="btn btn-primary me-2">
                         Browse Categories
                     </a>
-                    <a href="{{ url_for('blog.blog_list') }}" class="btn btn-outline-primary">
+                    <a href="#" class="btn btn-outline-primary">
                         View All Posts
                     </a>
                 </div>
@@ -65,7 +65,7 @@
             {% else %}
             <!-- Results found -->
             <div class="row">
-                {% for post in results.items %}
+                {% for post in results %}
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card blog-card h-100">
                         <img src="{{ post.thumbnail or '/static/images/default-thumbnail.jpg' }}" 
@@ -73,7 +73,7 @@
                         <div class="card-body">
                             <span class="badge bg-secondary mb-2">{{ post.category }}</span>
                             <h5 class="card-title fw-bold">
-                                <a href="{{ url_for('blog.blog_post', slug=post.slug) }}" 
+                                <a href="{{ url_for('/.post', slug=post.slug) }}" 
                                    class="text-decoration-none text-dark">
                                     {{ post.title }}
                                 </a>
@@ -84,9 +84,7 @@
 
                             <!-- Highlight search terms in content snippet -->
                             {% set content_snippet = post.content|striptags|truncate(150) %}
-                            <small class="text-muted">
-                                {{ highlight_terms(content_snippet, query) }}
-                            </small>
+                           
                         </div>
                         <div class="card-footer bg-transparent border-0">
                             <div class="d-flex justify-content-between align-items-center">
@@ -105,7 +103,7 @@
                 <ul class="pagination justify-content-center">
                     <li class="page-item {% if not results.has_prev %}disabled{% endif %}">
                         <a class="page-link" 
-                           href="{{ url_for('search.search', q=query, page=results.prev_num) if results.has_prev else '#' }}">
+                           href="{{ url_for('/.search', q=query, page=results.prev_num) if results.has_prev else '#' }}">
                             Previous
                         </a>
                     </li>
@@ -113,7 +111,7 @@
                     {% for page_num in results.iter_pages(left_edge=2, left_current=2, right_current=2, right_edge=2) %}
                         {% if page_num %}
                             <li class="page-item {% if page_num == results.page %}active{% endif %}">
-                                <a class="page-link" href="{{ url_for('search.search', q=query, page=page_num) }}">
+                                <a class="page-link" href="{{ url_for('/.search', q=query, page=page_num) }}">
                                     {{ page_num }}
                                 </a>
                             </li>
@@ -126,7 +124,7 @@
 
                     <li class="page-item {% if not results.has_next %}disabled{% endif %}">
                         <a class="page-link" 
-                           href="{{ url_for('search.search', q=query, page=results.next_num) if results.has_next else '#' }}">
+                           href="{{ url_for('/.search', q=query, page=results.next_num) if results.has_next else '#' }}">
                             Next
                         </a>
                     </li>
@@ -150,7 +148,7 @@
                                 <li><i class="bi bi-lightbulb me-2"></i>Try different keywords</li>
                                 <li><i class="bi bi-lightbulb me-2"></i>Check your spelling</li>
                                 <li><i class="bi bi-lightbulb me-2"></i>Use more specific terms</li>
-                                <li><i class="bi bi-lightbulb me-2"></i>Browse by <a href="{{ url_for('blog.categories') }}">categories</a></li>
+                                <li><i class="bi bi-lightbulb me-2"></i>Browse by <a href="{{ url_for('/.blogs') }}">categories</a></li>
                             </ul>
                         </div>
                     </div>

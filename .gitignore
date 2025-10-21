@@ -1,0 +1,10 @@
+*.pyc
+*pyo
+.replit
+__pycache__/
+venv/
+.idea/
+*.log
+*.swp
+*~
+!/.env

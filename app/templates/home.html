@@ -20,24 +20,6 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
-.category-badge {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    z-index: 2;
-}
-
-.blog-card {
-    border: none;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-}
-
-.blog-card:hover {
-    transform: translateY(-3px);
-}
-
 .author-avatar {
     width: 40px;
     height: 40px;
@@ -87,7 +69,7 @@
                 {% for post in featured_posts %}
                 <div class="col-lg-4 mb-4">
                     <div class="card featured-card h-100">
-                        <span class="category-badge badge bg-primary">{{ post.category }}</span>
+                        <span class="category-badge badge bg-primary">{{ post.category.name }}</span>
                         <img src="{{ url_for('static', filename=post.thumbnail) }}" 
                              class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
                         <div class="card-body">
@@ -96,7 +78,7 @@
                         </div>
                         <div class="card-footer bg-transparent border-0">
                             <div class="d-flex align-items-center">
-                                <img src="{{ post.author.userImg }}" 
+                                <img src="{{ post.author.avatar }}" 
                                      class="author-avatar me-2" alt="Author">
                                 <div>
                                     <small class="text-muted">{{ post.author.username }}</small>
@@ -132,26 +114,7 @@
             <div class="row">
                 {% for post in latest_posts %}
                 <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card blog-card h-100">
-                        <img src="{{ url_for('static', filename=post.thumbnail) }}" 
-                             class="card-img-top" alt="{{ post.title }}" style="height: 180px; object-fit: cover;">
-                        <div class="card-body">
-                            <span class="badge bg-secondary mb-2">{{ post.category }}</span>
-                            <h5 class="card-title">{{ post.title }}</h5>
-                            <p class="card-text text-muted">{{ post.excerpt[:80] }}...</p>
-                        </div>
-                        <div class="card-footer bg-transparent border-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <img src="{{ post.author.userImg }}" 
-                                         class="author-avatar me-2" alt="Author">
-                                    <small class="text-muted">{{ post.author.username }}</small>
-                                </div>
-                                <small class="text-muted">{{ post.created_at.strftime('%b %d') }}</small>
-                            </div>
-                        </div>
-                        <a href="{{ url_for('/.post', slug=post.slug) }}" class="stretched-link"></a>
-                    </div>
+                    {% include "components/post_card.html" %}
                 </div>
                 {% endfor %}
                 

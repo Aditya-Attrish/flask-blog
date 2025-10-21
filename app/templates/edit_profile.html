@@ -1,408 +1,527 @@
 {% extends "components/layout.html" %}
-{% block title %}Edit Post - {{ params["blog_web_name"] }} {% endblock %}
+{% block title %}Edit Profile - {{ params["blog_web_name"] }} {% endblock %}
 
 {% block head %}
-    <!-- Quill Rich Text Editor -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <!-- Dropzone for file uploads -->
-    <link href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" rel="stylesheet">
+
+            <style>
+                .profile-container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 2rem;
+                }
+
+                .profile-sidebar {
+                    position: sticky;
+                    top: 100px;
+                }
+
+                .avatar-container {
+                    text-align: center;
+                    padding: 2rem;
+                    background: #f8f9fa;
+                    border-radius: 15px;
+                    margin-bottom: 2rem;
+                }
+
+                .avatar-preview {
+                    width: 150px;
+                    height: 150px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 4px solid white;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                }
+
+                .avatar-upload {
+                    position: relative;
+                    display: inline-block;
+                }
+
+                .avatar-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0,0,0,0.5);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    cursor: pointer;
+                }
+
+                .avatar-upload:hover .avatar-overlay {
+                    opacity: 1;
+                }
+
+                .nav-pills .nav-link {
+                    border-radius: 10px;
+                    margin-bottom: 0.5rem;
+                    padding: 0.75rem 1rem;
+                    color: #6c757d;
+                    transition: all 0.3s ease;
+                }
+
+                .nav-pills .nav-link.active {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                }
+
+                .nav-pills .nav-link:hover:not(.active) {
+                    background: #f8f9fa;
+                    color: #495057;
+                }
+
+                .section-card {
+                    background: white;
+                    border-radius: 15px;
+                    padding: 2rem;
+                    margin-bottom: 2rem;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                }
+
+                .social-link-input {
+                    position: relative;
+                }
+
+                .social-link-input .input-group-text {
+                    background: #f8f9fa;
+                    border-right: none;
+                }
+
+                .social-link-input .form-control {
+                    border-left: none;
+                }
+
+                .char-count {
+                    font-size: 0.875rem;
+                    color: #6c757d;
+                }
+
+                .char-count.warning {
+                    color: #fd7e14;
+                }
+
+                .char-count.danger {
+                    color: #dc3545;
+                }
+            </style>
 {% endblock %}
-
-
-{% block styles %}
-        .create-hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 0;
-        }
-
-        .form-card {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            margin-top: -50px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .form-section {
-            border-bottom: 1px solid #e9ecef;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-        }
-
-        .form-section:last-child {
-            border-bottom: none;
-        }
-
-        .ql-editor {
-            min-height: 300px;
-            font-size: 1.1rem;
-            line-height: 1.8;
-            overflow-y: auto;
-        }
-
-        .featured-image-preview {
-            width: 100%;
-            height: 200px;
-            border: 2px dashed #dee2e6;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background: #f8f9fa;
-            cursor: pointer;
-        }
-
-        .featured-image-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .tag-input {
-            border: 1px solid #ced4da;
-            border-radius: 0.375rem;
-            padding: 0.375rem 0.75rem;
-            min-height: 100px;
-        }
-
-        .tag {
-            background: var(--primary-color);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            margin: 0.25rem;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .tag-remove {
-            margin-left: 0.5rem;
-            cursor: pointer;
-        }
-
-        .preview-sidebar {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            position: sticky;
-            top: 100px;
-        }
-
-        .preview-card {
-            border: none;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        }
-
-        .step-indicator {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .step {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            margin-right: 1rem;
-        }
-
-        .step.active {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .step-line {
-            flex: 1;
-            height: 2px;
-            background: #e9ecef;
-            margin: 0 1rem;
-        }
-
-        .dropzone {
-            border: 2px dashed #dee2e6;
-            border-radius: 10px;
-            padding: 2rem;
-            text-align: center;
-            background: #f8f9fa;
-            cursor: pointer;
-        }
-
-        .dropzone:hover {
-            border-color: var(--primary-color);
-        }
-
-        .character-count {
-            font-size: 0.9rem;
-            color: var(--secondary-color);
-        }
-
-        .character-count.warning {
-            color: #fd7e14;
-        }
-
-        .character-count.danger {
-            color: #dc3545;
-        }
-{% endblock %}
-
 {% block body %}
-    <!-- Hero Section -->
-    <section class="create-hero">
-        <div class="container">
-            <div class="row justify-content-center text-center">
-                <div class="col-lg-8">
-                    <h1 class="display-5 fw-bold mb-3">Create New Post</h1>
-                    <p class="lead mb-4">Share your knowledge and stories with the world</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Main Content -->
-    <section class="py-5">
-        <!-- message -->
-        {% include 'components/message.html' %}
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <!-- Step Indicator -->
-                    <div class="step-indicator">
-                        <div class="step active">1</div>
-                        <div class="step-line"></div>
-                        <div class="step">2</div>
-                        <div class="step-line"></div>
-                        <div class="step">3</div>
-                        <div class="step-line"></div>
-                        <div class="step">4</div>
-                    </div>
-
-                    <form id="blogForm" class="form-card" method="POST" enctype="multipart/form-data">
-                        <!-- Basic Information Section -->
-                        <div class="form-section">
-                            <h4 class="fw-bold mb-4"><i class="bi bi-info-circle me-2"></i>Basic Information</h4>
-
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="mb-4">
-                                        <label for="postTitle" class="form-label fw-bold">Post Title *</label>
-                                        <input type="text" class="form-control form-control-lg" value="{{ post.title }}" id="postTitle" 
-                                               name="title" required placeholder="Enter a compelling title...">
-                                        <div class="character-count" id="titleCount">0/120 characters</div>
-                                    </div>
-
-                                    <div class="mb-4">
-                                        <label for="postExcerpt" class="form-label fw-bold">Excerpt *</label>
-                                        <textarea class="form-control" id="postExcerpt" name="excerpt" 
-                                                  rows="3" required placeholder="Brief description of your post..."></textarea>
-                                        <div class="character-count" id="excerptCount">0/300 characters</div>
+            <div class="profile-container">
+                <div class="row">
+                    <!-- Sidebar -->
+                    <div class="col-lg-3">
+                        <div class="profile-sidebar">
+                            <!-- Avatar Section -->
+                            <div class="avatar-container">
+                                <div class="avatar-upload">
+                                    <img src="{{ url_for('static', filename=current_user.avatar) }}" 
+                                         alt="Profile Picture" 
+                                         class="avatar-preview"
+                                         id="avatarPreview">
+                                    <div class="avatar-overlay" id="avatarOverlay">
+                                        <i class="bi bi-camera text-white fs-4"></i>
                                     </div>
                                 </div>
+                                <input type="file" id="avatarInput" accept="image/*" class="d-none">
 
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">Featured Image *</label>
-                                    <div class="featured-image-preview mb-3" id="imagePreview" onclick="document.getElementById('featuredImage').click()">
-                                        <div class="text-center">
-                                            <i class="bi bi-image fs-1 text-muted"></i>
-                                            <p class="mt-2 text-muted">Click to upload image</p>
-                                        </div>
-                                    </div>
-                                    <input type="file" id="featuredImage" name="featured_image" accept="image/*" class="d-none" required>
-                                    <small class="text-muted">Recommended: 1200×630 px, max 2MB</small>
-                                </div>
-                            </div>
-                        </div>
+                                <h5 class="mt-3 mb-1">{{ current_user.full_name }}</h5>
+                                <p class="text-muted mb-2">@{{ current_user.username }}</p>
 
-                        <!-- Content Section -->
-                        <div class="form-section">
-                            <h4 class="fw-bold mb-4"><i class="bi bi-file-text me-2"></i>Content</h4>
-
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Post Content *</label>
-                                <div id="editor"></div>
-                                <input type="hidden" id="postContent" name="content" required>
-                            </div>
-                        </div>
-
-                        <!-- Categorization Section -->
-                        <div class="form-section">
-                            <h4 class="fw-bold mb-4"><i class="bi bi-tag me-2"></i>Categorization</h4>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-4">
-                                        <label for="postCategory" class="form-label fw-bold">Category *</label>
-                                        <select class="form-select" id="postCategory" name="category" required>
-                                            <option value="">Select a category</option>
-                                            <option value="technology">Technology</option>
-                                            <option value="lifestyle">Lifestyle</option>
-                                            <option value="travel">Travel</option>
-                                            <option value="business">Business</option>
-                                            <option value="health">Health</option>
-                                            <option value="education">Education</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="mb-4">
-                                        <label for="postTags" class="form-label fw-bold">Tags</label>
-                                        <div class="tag-input" id="tagContainer" onclick="document.getElementById('tagInput').focus()">
-                                            <input type="text" id="tagInput" class="border-0 w-100" placeholder="Type and press Enter to add tags...">
-                                        </div>
-                                        <input type="hidden" id="postTags" name="tags">
-                                        <small class="text-muted">Press Enter to add multiple tags</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- SEO & Settings Section -->
-                        <div class="form-section">
-                            <h4 class="fw-bold mb-4"><i class="bi bi-gear me-2"></i>SEO & Settings</h4>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-4">
-                                        <label for="postSlug" class="form-label fw-bold">URL Slug</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">blogsphere.com/blog/</span>
-                                            <input type="text" class="form-control" id="postSlug" name="slug" 
-                                                   placeholder="auto-generated-from-title">
-                                        </div>
-                                        <small class="text-muted">Leave blank to auto-generate from title</small>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="mb-4">
-                                        <label for="postMeta" class="form-label fw-bold">Meta Description</label>
-                                        <textarea class="form-control" id="postMeta" name="meta_description" 
-                                                  rows="2" placeholder="Optional SEO description..."></textarea>
-                                        <div class="character-count" id="metaCount">0/160 characters</div>
-                                    </div>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="document.getElementById('avatarInput').click()">
+                                        <i class="bi bi-upload"></i> Change
+                                    </button>
+                                    {% if "default-user.jpg" not in current_user.avatar %}
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAvatar()">
+                                        <i class="bi bi-trash"></i> Remove
+                                    </button>
+                                    {% endif %}
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-4">
-                                        <label class="form-label fw-bold">Publish Status</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="status" 
-                                                   id="statusDraft" value="draft" checked>
-                                            <label class="form-check-label" for="statusDraft">
-                                                Save as Draft
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="status" 
-                                                   id="statusPublish" value="publish">
-                                            <label class="form-check-label" for="statusPublish">
-                                                Publish Immediately
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="status" 
-                                                   id="statusSchedule" value="schedule">
-                                            <label class="form-check-label" for="statusSchedule">
-                                                Schedule Publication
-                                            </label>
-                                        </div>
-                                    </div>
+                            <!-- Navigation -->
+                            <ul class="nav nav-pills flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#personal" data-bs-toggle="tab">
+                                        <i class="bi bi-person me-2"></i>Personal Info
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#social" data-bs-toggle="tab">
+                                        <i class="bi bi-share me-2"></i>Social Links
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#preferences" data-bs-toggle="tab">
+                                        <i class="bi bi-gear me-2"></i>Preferences
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <!-- Stats -->
+                            <div class="mt-4 p-3 bg-light rounded">
+                                <h6 class="fw-bold">Profile Stats</h6>
+                                <div class="d-flex justify-content-between">
+                                    <span>Posts:</span>
+                                    <strong>{{ current_user.posts | length }}</strong>
                                 </div>
-
-                                <div class="col-md-6" id="scheduleField" style="display: none;">
-                                    <div class="mb-4">
-                                        <label for="publishDate" class="form-label fw-bold">Schedule Date & Time</label>
-                                        <input type="datetime-local" class="form-control" id="publishDate" name="publish_date">
-                                    </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Member since:</span>
+                                    <strong>{{ current_user.created_at.strftime('%b %Y') }}</strong>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <button type="button" class="btn btn-outline-secondary me-2" id="previewBtn">
-                                    <i class="bi bi-eye me-1"></i>Preview
-                                </button>
-                                <button type="submit" name="action" value="draft" class="btn btn-outline-primary">
-                                    <i class="bi bi-file-earmark me-1"></i>Save Draft
-                                </button>
-                            </div>
-                            <div>
-                                <button type="submit" name="action" value="publish" class="btn btn-primary">
-                                    <i class="bi bi-rocket-takeoff me-1"></i>Publish Now
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Preview Sidebar -->
-                <div class="col-lg-4 d-none d-lg-block">
-                    <div class="preview-sidebar">
-                        <h5 class="fw-bold mb-4">Live Preview</h5>
-
-                        <div class="preview-card mb-4">
-                            <div id="previewImage" class="bg-light" style="height: 150px; display: flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-image text-muted fs-1"></i>
-                            </div>
-                            <div class="card-body">
-                                <h6 id="previewTitle" class="card-title fw-bold">Your post title will appear here</h6>
-                                <p id="previewExcerpt" class="card-text text-muted small">Post excerpt will be shown here...</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted" id="previewCategory">Category</small>
-                                    <small class="text-muted" id="previewReadTime">0 min read</small>
+                                <div class="d-flex justify-content-between">
+                                    <span>Last active:</span>
+                                    <strong>{{ current_user.last_seen.strftime('%b %d, %Y') if current_user.last_seen else 'Recently' }}</strong>
                                 </div>
-                            </div>
-                        </div>
-
-                        <h6 class="fw-bold mb-3">SEO Preview</h6>
-                        <div class="bg-light p-3 rounded mb-4">
-                            <div class="text-primary mb-1 small" id="previewUrl">blogsphere.com/blog/...</div>
-                            <div class="fw-bold mb-1" id="previewSeoTitle">Title</div>
-                            <div class="text-muted small" id="previewMeta">Meta description will appear here...</div>
-                        </div>
-
-                        <h6 class="fw-bold mb-3">Statistics</h6>
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <div class="fw-bold" id="wordCount">0</div>
-                                <small class="text-muted">Words</small>
-                            </div>
-                            <div class="col-4">
-                                <div class="fw-bold" id="charCount">0</div>
-                                <small class="text-muted">Characters</small>
-                            </div>
-                            <div class="col-4">
-                                <div class="fw-bold" id="readTime">0</div>
-                                <small class="text-muted">Min read</small>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Main Content -->
+                    <div class="col-lg-9">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="fw-bold">Edit Profile</h2>
+                            <a href="{{ url_for('user.profile', username=current_user.username) }}" 
+                               class="btn btn-outline-primary">
+                                <i class="bi bi-eye"></i> View Public Profile
+                            </a>
+                        </div>
+
+                        <!-- Flash Messages -->
+                        {% include 'components/message.html' %}
+
+                        <form method="POST" enctype="multipart/form-data" id="profileForm">
+                            {{ form.hidden_tag() }}
+
+                            <div class="tab-content">
+                                <!-- Personal Information Tab -->
+                                <div class="tab-pane fade show active" id="personal">
+                                    <div class="section-card">
+                                        <h4 class="fw-bold mb-4">
+                                            <i class="bi bi-person me-2"></i>Personal Information
+                                        </h4>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">First Name</label>
+                                                    {{ form.first_name(class="form-control", placeholder="John") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Last Name</label>
+                                                    {{ form.last_name(class="form-control", placeholder="Doe") }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Bio</label>
+                                            {{ form.bio(class="form-control", rows="4", 
+                                                      placeholder="Tell us about yourself...") }}
+                                            <div class="char-count" id="bioCharCount">0/500 characters</div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Location</label>
+                                                    {{ form.location(class="form-control", placeholder="City, Country") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Website</label>
+                                                    {{ form.website(class="form-control", placeholder="https://example.com") }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Social Links Tab -->
+                                <div class="tab-pane fade" id="social">
+                                    <div class="section-card">
+                                        <h4 class="fw-bold mb-4">
+                                            <i class="bi bi-share me-2"></i>Social Links
+                                        </h4>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Twitter</label>
+                                            <div class="social-link-input">
+                                                <div class="input-group">
+                                                    <span class="input-group-text">
+                                                        <i class="bi bi-twitter text-primary"></i>
+                                                    </span>
+                                                    {{ form.twitter_url(class="form-control", placeholder="https://twitter.com/username") }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">LinkedIn</label>
+                                            <div class="social-link-input">
+                                                <div class="input-group">
+                                                    <span class="input-group-text">
+                                                        <i class="bi bi-linkedin text-primary"></i>
+                                                    </span>
+                                                    {{ form.linkedin_url(class="form-control", placeholder="https://linkedin.com/in/username") }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">GitHub</label>
+                                            <div class="social-link-input">
+                                                <div class="input-group">
+                                                    <span class="input-group-text">
+                                                        <i class="bi bi-github"></i>
+                                                    </span>
+                                                    {{ form.github_url(class="form-control", placeholder="https://github.com/username") }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Instagram</label>
+                                            <div class="social-link-input">
+                                                <div class="input-group">
+                                                    <span class="input-group-text">
+                                                        <i class="bi bi-instagram text-danger"></i>
+                                                    </span>
+                                                    {{ form.instagram_url(class="form-control", placeholder="https://instagram.com/username") }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Preferences Tab -->
+                                <div class="tab-pane fade" id="preferences">
+                                    <div class="section-card">
+                                        <h4 class="fw-bold mb-4">
+                                            <i class="bi bi-gear me-2"></i>Preferences
+                                        </h4>
+
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                {{ form.newsletter(class="form-check-input") }}
+                                                <label class="form-check-label fw-bold">
+                                                    Subscribe to newsletter
+                                                </label>
+                                                <div class="form-text">
+                                                    Receive updates about new features and content
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                {{ form.public_profile(class="form-check-input") }}
+                                                <label class="form-check-label fw-bold">
+                                                    Public profile
+                                                </label>
+                                                <div class="form-text">
+                                                    Allow others to view your profile and posts
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                {{ form.email_notifications(class="form-check-input") }}
+                                                <label class="form-check-label fw-bold">
+                                                    Email notifications
+                                                </label>
+                                                <div class="form-text">
+                                                    Receive email notifications for comments and interactions
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{{ url_for('user.admin') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle"></i> Update Profile
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+{% endblock %}
+{% block scripts %}
+            <script>
+                class ProfileEditor {
+                    constructor() {
+                        this.init();
+                    }
 
-    
-    <!-- Quill Rich Text Editor -->
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    <!-- Dropzone for file uploads -->
-    <script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>
+                    init() {
+                        this.setupEventListeners();
+                        this.setupCharacterCounters();
+                        this.setupAvatarUpload();
+                    }
 
-    <script src="{{ url_for('static', filename='js/add_blog.js') }}">
+                    setupEventListeners() {
+                        // Tab switching
+                        const tabLinks = document.querySelectorAll('.nav-link[data-bs-toggle="tab"]');
+                        tabLinks.forEach(link => {
+                            link.addEventListener('shown.bs.tab', (e) => {
+                                // Save active tab to localStorage
+                                localStorage.setItem('activeProfileTab', e.target.getAttribute('href'));
+                            });
+                        });
+
+                        // Restore active tab
+                        const activeTab = localStorage.getItem('activeProfileTab');
+                        if (activeTab) {
+                            const tab = document.querySelector(`[href="${activeTab}"]`);
+                            if (tab) {
+                                new bootstrap.Tab(tab).show();
+                            }
+                        }
+
+                        // Form submission
+                        document.getElementById('profileForm').addEventListener('submit', (e) => {
+                            this.showLoadingState();
+                        });
+                    }
+
+                    setupCharacterCounters() {
+                        const bioTextarea = document.getElementById('bio');
+                        const charCount = document.getElementById('bioCharCount');
+
+                        if (bioTextarea && charCount) {
+                            // Set initial count
+                            charCount.textContent = `${bioTextarea.value.length}/500 characters`;
+
+                            bioTextarea.addEventListener('input', () => {
+                                const length = bioTextarea.value.length;
+                                charCount.textContent = `${length}/500 characters`;
+
+                                if (length > 450) {
+                                    charCount.className = 'char-count warning';
+                                } else if (length > 500) {
+                                    charCount.className = 'char-count danger';
+                                } else {
+                                    charCount.className = 'char-count';
+                                }
+                            });
+                        }
+                    }
+
+                    setupAvatarUpload() {
+                        const avatarInput = document.getElementById('avatarInput');
+                        const avatarPreview = document.getElementById('avatarPreview');
+
+                        avatarInput.addEventListener('change', (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                                this.uploadAvatar(file);
+                            }
+                        });
+                    }
+
+                    async uploadAvatar(file) {
+                        const formData = new FormData();
+                        formData.append('avatar', file);
+
+                        try {
+                            const response = await fetch('/api/profile/avatar', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-Token': this.getCSRFToken()
+                                },
+                                body: formData
+                            });
+
+                            const result = await response.json();
+
+                            if (result.success) {
+                                // Update avatar preview
+                                document.getElementById('avatarPreview').src = result.avatar_url;
+                                this.showAlert('Avatar updated successfully!', 'success');
+                            } else {
+                                this.showAlert(result.message, 'danger');
+                            }
+                        } catch (error) {
+                            console.error('Avatar upload error:', error);
+                            this.showAlert('Error uploading avatar', 'danger');
+                        }
+                    }
+
+                    showLoadingState() {
+                        const submitBtn = document.querySelector('button[type="submit"]');
+                        const originalText = submitBtn.innerHTML;
+                        submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spinner"></i> Updating...';
+                        submitBtn.disabled = true;
+
+                        // Revert after 5 seconds (fallback)
+                        setTimeout(() => {
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        }, 5000);
+                    }
+
+                    getCSRFToken() {
+                        return document.querySelector('[name=csrf_token]').value;
+                    }
+
+                    showAlert(message, type) {
+                        const alert = document.createElement('div');
+                        alert.className = `alert alert-${type} alert-dismissible fade show`;
+                        alert.innerHTML = `
+                            ${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        `;
+
+                        document.querySelector('.profile-container').prepend(alert);
+
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 5000);
+                    }
+                }
+
+                async function deleteAvatar() {
+                    if (!confirm('Are you sure you want to remove your profile picture?')) {
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/profile/delete-avatar', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-Token': document.querySelector('[name=csrf_token]').value
+                            }
+                        });
+
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    } catch (error) {
+                        console.error('Error deleting avatar:', error);
+                    }
+                }
+
+                // Initialize profile editor
+                document.addEventListener('DOMContentLoaded', function() {
+                    window.profileEditor = new ProfileEditor();
+                });
+            </script>
+       
 {% endblock %}

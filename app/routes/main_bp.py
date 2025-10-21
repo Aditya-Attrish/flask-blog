@@ -1,45 +1,28 @@
 from flask import Blueprint, render_template, request, url_for
 from app.models.posts import BlogPost
 from app.models.contact import Contact
+from app.models.category import Category
 from app.extensions import db, params
 
 main_bp = Blueprint('/', __name__)
 
 @main_bp.route('/')
 def home():
-    from app.models.user import User
-    
     # Get featured posts (most viewed or recent popular posts)
     featured_posts = BlogPost.query.filter_by(status='published').order_by(BlogPost.views.desc()).limit(3).all()
     
     # Get latest posts for the recent section
     latest_posts = BlogPost.query.filter_by(status='published').order_by(BlogPost.created_at.desc()).limit(6).all()
     
-    # Get categories with post counts
-    categories = db.session.query(
-        BlogPost.category,
-        db.func.count(BlogPost.sno).label('count')
-    ).filter_by(status='published').group_by(BlogPost.category).all()
-    
-    # Format categories for template
+    # Get categories with post count
+    categories = Category.query.all()
     formatted_categories = []
-    category_icons = {
-        'Technology': 'laptop',
-        'Lifestyle': 'heart',
-        'Travel': 'geo-alt',
-        'Business': 'graph-up',
-        'Health': 'activity',
-        'Education': 'book',
-        'Design': 'palette',
-        'Programming': 'code-slash'
-    }
-    
-    for category, count in categories:
+    for category in categories:
         formatted_categories.append({
-            'name': category,
-            'icon': category_icons.get(category, 'tag'),
-            'count': count
-        })
+            'name': category.name,
+            'icon': category.icon,
+            'count': BlogPost.query.filter_by(category_id=category.id, status='published').count()
+            })
     
     return render_template('home.html', 
                          featured_posts=featured_posts,
@@ -51,8 +34,7 @@ def home():
 def blogs():
     page = request.args.get('page', 1, type=int)
     per_page = params["no_of_per_page"]  # Adjust as needed
-    posts = BlogPost.query.order_by(BlogPost.created_at.desc()).paginate(
-        page=page, per_page=per_page, error_out=False)
+    posts = BlogPost.query.filter_by(status='published').order_by(BlogPost.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
 
     # Sample data for sidebar (you would replace this with actual database queries)
     categories = [
@@ -91,15 +73,20 @@ def search():
     page = request.args.get('page', 1, type=int)
     per_page = params["no_of_per_page"]
     
-    # If no query, show recent posts or empty results
     results = BlogPost.query.filter_by(status='published').order_by(
-            BlogPost.publish_date.desc()
-        ).paginate(page=page, per_page=per_page, error_out=False)
+        BlogPost.publish_date.desc()
+    )
+    # If no query, show recent posts or empty results
+    if query:
+        results = results.filter(
+            (BlogPost.title.ilike(f'%{query}%')) |
+            (BlogPost.content.ilike(f'%{query}%')))
+    results = results.paginate(page=page, per_page=per_page, error_out=False)
     return render_template('search.html', 
                             params=params,
                              results=results, 
                              query=query,
-                             search_performed=False)
+                             search_performed=True)
 
 @main_bp.route("/contact", methods=['GET', 'POST'])
 def contact():
@@ -140,7 +127,7 @@ def post(slug):
             'id': comment.id,
             'content': comment.text,
             'author': user.username,
-            'avatar': user.userImg,
+            'avatar': user.avatar,
             'time': comment.date_posted.strftime('%B %d, %Y at %I:%M %p'),
             'likes': 0  # You can add a likes field to Comment model later
         })

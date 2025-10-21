@@ -1,4 +1,3 @@
-
 # Flask Blog Application
 
 A full-featured blog application built with Flask that demonstrates modern web development practices, user authentication, and CRUD operations.
@@ -76,11 +75,16 @@ flask-blog/
 
 ### BlogPost Model
 - Serial Number (Primary Key)
-- Title
+- Title (120 charactors)
+- Excerpt (300 charactors)
+- Slug (300 charactors)
 - Content (Text)
 - Thumbnail Image Path
-- Date Posted
+- views (Integer)
+- Date Posted (Datetime)
+- Created_at (Datetime)
 - Author (Foreign Key to User)
+- Comment (Foreign Key to Comment)
 
 ### Contact Model
 - ID (Primary Key)
